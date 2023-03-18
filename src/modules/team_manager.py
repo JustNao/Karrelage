@@ -233,7 +233,7 @@ class TeamManager:
         self.auto_turn = False
         windows = ag.getAllTitles()  # type: ignore
         self.windows = [x for x in windows if re.search("- Dofus \d\.", x)]  # type: ignore
-        self.player_characters = [window.split()[0] for window in self.windows]
+        self.player_characters = [(window.split()[0]) for window in self.windows]
         self.team: list[Player] = []
         self.buffer_team = {}
         self.buffer = []
@@ -252,14 +252,18 @@ class TeamManager:
             print("No character was manually put, and no file could be detected")
             return
         for name in importedChars:
-            print(f"Importing {Fore.BLUE}{name}{Fore.RESET}")
-            windows = [x for x in self.windows if re.search(name, x)]
-            if len(windows) > 0:
-                window_name = windows[0]
-                self.characters[name] = win32gui.FindWindow(
+            if name not in self.player_characters:
+                self.player_characters.append(name)
+
+    def get_window(self, name):
+        dofus_windows = [x for x in ag.getAllTitles() if re.search("- Dofus \d\.", x)]
+        for window in dofus_windows:
+            if name in window:
+                return win32gui.FindWindow(
                     None,
-                    window_name,
+                    window,
                 )
+        return None
 
     def save_packet(self, packet):
         self.buffer.append(packet)
@@ -276,7 +280,6 @@ class TeamManager:
         return hash(json.dumps(team))
 
     def packetRead(self, msg):
-
         name = protocol.msg_from_id[msg.id]["name"]
 
         if name == "GameFightUpdateTeamMessage":
@@ -316,10 +319,7 @@ class TeamManager:
 
                 # Get the correspond window if we are playing the character
                 if any(member["name"] == x for x in self.player_characters):
-                    window = win32gui.FindWindow(
-                        None,
-                        [x for x in self.windows if re.search(member["name"], x)].pop(),
-                    )
+                    window = self.get_window(member["name"])
 
                 # New team member
                 if self.get_player(member["id"]) is None:
@@ -390,12 +390,7 @@ class TeamManager:
             if fighter["contextualId"] not in [x.id for x in self.team]:
                 window = None
                 if any(fighter["name"] == x for x in self.player_characters):
-                    window = win32gui.FindWindow(
-                        None,
-                        [
-                            x for x in self.windows if re.search(fighter["name"], x)
-                        ].pop(),
-                    )
+                    window = self.get_window(fighter["name"])
                 new_player = Player(
                     id=fighter["contextualId"],
                     name=fighter["name"],
@@ -501,6 +496,7 @@ class TeamManager:
                 self.team = []
                 self.buffer_team = {}
                 self.fighting = True
+            pass
 
         elif name == "GameFightEndMessage":
             self.fighting = False
@@ -554,12 +550,13 @@ class TeamManager:
     def all_move(self):
         x, y = mouse.get_position()
         lParam = win32api.MAKELONG(x, y)
-        for character_window in self.characters.values():
+        for character in self.player_characters:
+            window = self.get_window(character)
             win32api.SendMessage(
-                character_window, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, lParam  # type: ignore
+                window, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, lParam  # type: ignore
             )
             win32api.SendMessage(
-                character_window, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, lParam  # type: ignore
+                window, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, lParam  # type: ignore
             )
 
     def get_team(self):

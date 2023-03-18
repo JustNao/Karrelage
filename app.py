@@ -18,7 +18,8 @@ manager = Manager(
         # Display string, module name, class name
         ("HDV Filter", "hdv_filter", "HDVFilter"),
         ("Team Manager", "team_manager", "TeamManager"),
-    ]
+    ],
+    type="attach",
 )
 module = None
 
@@ -122,18 +123,6 @@ def update():
         print(data)
         module.update(data)
     return "ok"
-
-
-@app.route("/string")
-def string():
-    from src.sniffer import network
-    from src.modules.stringSearch import Searcher
-
-    module = Searcher(manager)
-    network.flushBuffers()
-    network.launch_in_thread(module.packetRead)
-
-    return render_template("string.html", content=manager.get_data())
 
 
 def start_flask(**server_kwargs):

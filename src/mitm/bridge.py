@@ -16,7 +16,7 @@ import logging
 import time
 
 from ..data import Buffer, Msg, Dumper
-from .. import protocol
+from ..sniffer import protocol
 
 logger = logging.getLogger("labot")
 # TODO: use the logger
@@ -122,23 +122,13 @@ class MsgBridgeHandler(DummyBridgeHandler, ABC):
 
     def handle(self, data, origin):
         super().handle(data, origin)
-        self.buf[origin] += data
         from_client = origin == self.coJeu
-        # print(direction(origin), self.buf[origin].data)
+        self.buf[origin] += data
         msg = Msg.fromRaw(self.buf[origin], from_client)
+        if msg is None:
+            self.buf[origin].end()
         while msg is not None:
-            msgType = protocol.msg_from_id[msg.id]
-            parsedMsg = protocol.read(msgType, msg.data)
-
-            assert (
-                msg.data.remaining() == 0
-            ), "All content of %s have not been read into %s:\n %s" % (
-                msgType,
-                parsedMsg,
-                msg.data,
-            )
-
-            self.handle_message(parsedMsg, origin)
+            self.handle_message(msg, origin)
             msg = Msg.fromRaw(self.buf[origin], from_client)
 
     @abstractmethod
@@ -237,3 +227,13 @@ class InjectorBridgeHandler(BridgeHandler):
 
     def handle_message(self, m, o):
         pass
+
+
+class KarrelageBridgeHandler(MsgBridgeHandler):
+    def __init__(self, coJeu, coSer, packet_read):
+        super().__init__(coJeu, coSer)
+        self.db = deque([], maxlen=100)
+        self.packet_read = packet_read
+
+    def handle_message(self, msg, origin):
+        self.packet_read(msg)
