@@ -1,0 +1,11 @@
+colorama==0.4.5
+flaskwebgui==1.0.3
+keyboard==0.13.5
+mouse==0.7.1
+numpy==1.23.0
+PyAutoGUI==0.9.53
+PyGetWindow==0.0.9
+pywin32==304
+scapy==2.4.2
+waitress==2.1.2
+win32gui==221.6

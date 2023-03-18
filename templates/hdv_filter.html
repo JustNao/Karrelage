@@ -1,0 +1,72 @@
+{% extends 'base.html' %} {% block script %}
+<script type="text/javascript">
+  function updater() {
+    item_div = document.querySelector("#item");
+    current_item = item_div.getAttribute("name");
+    $.post("/hdv_filter_data", {
+      name: current_item,
+    }, function (data) {
+     if (data['new_data']){
+      location.reload();
+    }
+    });
+  }
+  data_refresh = setInterval(updater, 500);
+  window.resizeTo(600, 250 + parseInt("{{ content|length * 38 }}"));
+</script>
+{% endblock %} {% block content %} {% if (content|length) > 0 %}
+<form
+  class="flex flex-col justify-center items-center"
+  action="{{url_for('hdv_filter_data')}}"
+  method="post""
+  id="item"
+  name="{{name}}"
+>
+  <div class="flex flex-col">
+    <span class="text-2xl"><b>{{name}}</b></span>
+    <span class="text-sm text-gray-300 -mt-0.5 mb-2">Niveau {{level}}</span>
+  </div>
+  <div>
+    {% for effect in content %}
+    <div class="flex mt-2 ml-20">
+      <div class="flex">
+        <span
+          class="text-sm text-white text-center pt-[3px]
+           {% if content[effect].operator == '+' %}
+           bg-green-700
+           {% else %}
+           bg-red-700
+           {% endif %}
+           border border-r-0 border-gray-300 rounded-l-md w-7"
+        >
+          {{content[effect].operator}}
+        </span>
+        <input
+          type="text"
+          name="{{effect}}"
+          class="w-32 py-1 rounded-none rounded-r-md bg-gray-700 border text-white focus:ring-blue-500 focus:border-blue-500 block min-w-0 text-sm border-gray-300"
+          placeholder="{{content[effect].min}} {% if content[effect].max != 0 %} à {{content[effect].max}}
+          {% endif %}
+          "
+        />
+        <span class="inline-flex items-center pl-3 text-base">
+          {{content[effect].type}}
+        </span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="mt-6 flex justify-center">
+    <button
+      type="submit"
+      class="text-white bg-gray-900 border border-gray-300 focus:outline-none hover:bg-gray-700 focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
+    >
+      Filter
+    </button>
+  </div>
+</form>
+{% else %}
+<div id="item" name="{{name}}">
+  You need to select an item on the auction house
+</div>
+{% endif %} {% endblock %}

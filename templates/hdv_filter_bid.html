@@ -1,0 +1,272 @@
+{% extends 'base.html' %} {% block script %}
+<script>
+  let changing = false;
+  sessionStorage.setItem("negative", "{{ settings.negative }}" == "true");
+  function toggle_view() {
+    if (changing) return;
+
+    const negative_view = sessionStorage.getItem("negative") == "true";
+    const show_negative = !negative_view;
+
+    setTimeout(function () {
+      changing = false;
+    }, 50);
+
+    $.post(
+      "/session_update",
+      {
+        negative: show_negative,
+      },
+      (data) => {
+        console.log("Updated negative with ", show_negative);
+      }
+    );
+    sessionStorage.setItem("negative", show_negative);
+
+    if (show_negative) {
+      document.getElementById("negative-view").style.display = "block";
+      document.getElementById("normal-view").style.display = "none";
+    } else {
+      document.getElementById("negative-view").style.display = "none";
+      document.getElementById("normal-view").style.display = "block";
+    }
+    changing = true;
+  }
+  window.resizeTo(600, 350 + parseInt("{{ effects|length * 30 }}"));
+</script>
+{% endblock %} {% block content %} {% if effects is not none %}
+<div class="flex flex-col h-full items-center">
+  <div class="flex justify-center my-6">
+    <a href="{{url_for('hdv_filter_bid', index=((index-1)%total))}}">
+      <button
+        type="button"
+        class="text-gray-400 border border-gray-400 hover:bg-gray-800 hover:text-white hover:border-white focus:ring-0 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center mr-2 rotate-180"
+      >
+        <svg
+          aria-hidden="true"
+          class="w-5 h-5"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+        <span class="sr-only">Icon description</span>
+      </button>
+    </a>
+    <a href="{{url_for('hdv_filter_bid', index=((index+1)%total))}}">
+      <button
+        type="button"
+        class="text-gray-400 border border-gray-400 hover:bg-gray-800 hover:text-white hover:border-white focus:ring-0 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center mr-2"
+      >
+        <svg
+          aria-hidden="true"
+          class="w-5 h-5"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+      </button>
+    </a>
+  </div>
+  <div
+    class="flex flex-col w-full h-fit justify-center items-center bg-black/80 rounded-md px-10 py-6"
+  >
+  <div># {{index + 1}} / {{total}}</div>
+  <div class="text-yellow-300">{{ price }} K</div>
+  <div class="self-start">
+      <div class="flex flex-col w-full mb-2">
+        <span class="text-lg"><b>{{name}}</b></span>
+        <span class="text-sm text-gray-300 -mt-0.5">Niveau {{level}}</span>
+      </div>
+      <div
+        id="negative-view"
+        class="{% if settings.negative == 'false' %} hidden {% endif %}"
+      >
+        {% for effect in effects %}
+        <div class="flex">
+          <div class="flex">
+            {% if effect.exo %}
+            <!-- EXO -->
+            <span class="inline-flex items-center pl-3 text-base text-blue-500">
+              + {{ effect.value }} {{ effect.name }}
+            </span>
+            {% elif effect.value >= effect.max %}
+            <!-- PERFECT AND OVER -->
+            <span
+              class="inline-flex items-center pl-3 text-base text-green-400"
+            >
+              <b>
+                {% if effect.over == 0 %} - 0 {% endif %} {% if effect.over > 0
+                %}
+                <span class="text-purple-600">+{{ effect.over }}</span>
+                {% endif %} {{ effect.name }}
+              </b>
+              <span class="ml-2 text-gray-400">
+                [{{ effect.min }} à {{ effect.max }}]
+              </span>
+            </span>
+            {% elif effect.value == 0 %}
+            <!-- MISSING STAT -->
+            <span class="inline-flex items-center pl-3 text-base text-red-700">
+              - {{ effect.max }} {{ effect.name }}
+              <span class="ml-2 text-gray-400">
+                [{{ effect.min }} à {{ effect.max }}]
+              </span>
+            </span>
+            {% elif effect.operator == '-' %}
+            <!-- NEGATIVE STAT -->
+            <span
+              class="inline-flex items-center pl-3 text-base text-green-400"
+            >
+              - {{ effect.value - effect.max }} {{ effect.name }}
+              <span class="ml-2 text-gray-400">
+                [-{{ effect.max }} à -{{ effect.min }}]
+              </span>
+            </span>
+            {% elif effect.value < effect.min %}
+            <!-- DOWNED STAT -->
+            <span
+              class="inline-flex items-center pl-3 text-base text-yellow-400"
+            >
+              - {{ effect.max - effect.value }} {{ effect.name }}
+              <span class="ml-2 text-gray-400">
+                [{{ effect.min }} à {{ effect.max }}]
+              </span>
+            </span>
+            {% else %}
+            <!-- NORMAL STAT -->
+            <span
+              class="inline-flex items-center pl-3 text-base text-green-400"
+            >
+              - {{ effect.max - effect.value }} {{ effect.name }}
+              <span class="ml-2 text-gray-400">
+                [{{ effect.min }} à {{ effect.max }}]
+              </span>
+            </span>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div
+        id="normal-view"
+        class="{% if settings.negative == 'true' %} hidden {% endif %}"
+      >
+        {% for effect in effects %}
+        <div class="flex">
+          <div class="flex">
+            {% if effect.exo %}
+            <!-- EXO -->
+            <span class="inline-flex items-center pl-3 text-base text-blue-500">
+              + {{ effect.value }} {{ effect.name }}
+            </span>
+            {% elif effect.value >= effect.max %}
+            <!-- PERFECT AND OVER -->
+            <span
+              class="inline-flex items-center pl-3 text-base text-green-400"
+            >
+              <b>
+                {{ effect.value }} {% if effect.over > 0 %}
+                <span class="text-purple-600">(+{{ effect.over }})</span>
+                {% endif %} {{ effect.name }}
+              </b>
+              <span class="ml-2 text-gray-400">
+                [{{ effect.min }} à {{ effect.max }}]
+              </span>
+            </span>
+            {% elif effect.value == 0 %}
+            <!-- MISSING STAT -->
+            <span class="inline-flex items-center pl-3 text-base text-gray-400">
+              {{ effect.value }} {{ effect.name }}
+              <span class="ml-2 text-gray-400">
+                [{{ effect.min }} à {{ effect.max }}]
+              </span>
+            </span>
+            {% elif effect.operator == '-' %}
+            <!-- NEGATIVE STAT -->
+            <span class="inline-flex items-center pl-3 text-base text-red-700">
+              - {{ effect.value }} {{ effect.name }}
+              <span class="ml-2 text-gray-400">
+                [-{{ effect.max }} à -{{ effect.min }}]
+              </span>
+            </span>
+            {% elif effect.value < effect.min %}
+            <!-- DOWNED STAT -->
+            <span
+              class="inline-flex items-center pl-3 text-base text-yellow-400"
+            >
+              {{ effect.value }} {{ effect.name }}
+              <span class="ml-2 text-gray-400">
+                [{{ effect.min }} à {{ effect.max }}]
+              </span>
+            </span>
+            {% else %}
+            <!-- NORMAL STAT -->
+            <span
+              class="inline-flex items-center pl-3 text-base text-green-400"
+            >
+              {{ effect.value }} {{ effect.name }}
+              <span class="ml-2 text-gray-400">
+                [{{ effect.min }} à {{ effect.max }}]
+              </span>
+            </span>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <label
+    class="relative inline-flex items-center cursor-pointer mt-4"
+    onclick="toggle_view()"
+  >
+    {% if settings.negative == 'true' %}
+    <input
+      type="checkbox"
+      value=""
+      id="negative-toggle"
+      class="sr-only peer"
+      checked
+    />
+    {% else %}
+    <input type="checkbox" value="" id="negative-toggle" class="sr-only peer" />
+    {% endif %}
+    <div
+      class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-700"
+    ></div>
+    <span class="ml-3 text-sm font-medium text-gray-300">Negative stats</span>
+  </label>
+</div>
+{% else %}
+<div class="flex flex-col h-full min-w-[420px]">
+  <div
+    class="flex flex-col w-full h-fit justify-center items-center bg-black/80 rounded-md py-3 mt-10"
+  >
+    <div>No bids found with your filters</div>
+  </div>
+</div>
+
+{% endif %}
+<div class="absolute left-10 bottom-5 top-auto">
+  <a href="{{url_for('hdv_filter')}}">
+    <button
+      type="button"
+      class="text-gray-300 hover:text-white border border-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+    >
+      Back
+    </button>
+  </a>
+</div>
+{% endblock %}

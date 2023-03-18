@@ -1,0 +1,215 @@
+{% extends 'base.html' %} {% block script %}
+<script type="text/javascript">
+  let changing = false;
+
+  function updater() {
+    const current_hash = "{{ hash }}";
+    $.post("/team_update", function (data) {
+      if (data["hash"] != current_hash) {
+        location.reload();
+      }
+    });
+  }
+
+  function toggle_auto_turn(id) {
+    if (changing) return;
+
+    setTimeout(function () {
+      changing = false;
+    }, 50);
+
+    $.post("/update", {
+      data: parseInt(id),
+    });
+    changing = true;
+  }
+
+  data_refresh = setInterval(updater, 500);
+  window.resizeTo(250 + parseInt("{{ team|length * 255 }}"), 600);
+</script>
+{% endblock %} {% block content %} {% if team|length > 0 %}
+<div class="flex flex-row w-full justify-center items-center" id="team-manager">
+  {% for member in team %}
+  <div
+    class="relative h-full bg-black border border-black rounded-lg min-w-[15rem] flex flex-col items-center my-20 py-6 mx-4 shadow-xl shadow-black/50"
+  >
+    <img
+      src="/static/img/classes/{{ member.breed }}_{{ member.sex }}.png"
+      class="mb-3 w-24 h-24 border border-black/50 rounded-md"
+    />
+    <div class="text-2xl font-semibold">{{member.name}}</div>
+    <div class="text-base text-gray-500 -mt-1 font-semibold">
+      {{ member.level }}
+    </div>
+    {% if member.total_health > 0 %}
+    <div class="flex flex-row items-center">
+      <div class="w-6 mr-1">
+        <svg
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          viewBox="0 0 14 14"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g>
+            <path
+              d="M14.0 0.0 L14.0 14.0 0.0 14.0 0.0 0.0 14.0 0.0"
+              fill="#ffffff"
+              fill-opacity="0.0"
+              fill-rule="evenodd"
+              stroke="none"
+            />
+            <path
+              d="M12.1 2.35 Q12.7 3.1 13.05 4.45 L12.9 6.4 Q11.8 10.1 7.05 12.7 2.3 10.1 1.2 6.4 L1.7 7.45 Q4.2 10.5 7.05 10.25 13.95 9.05 12.1 2.35"
+              fill="#b20000"
+              fill-rule="evenodd"
+              stroke="none"
+            />
+            <path
+              d="M1.2 6.4 Q0.85 5.45 1.0 4.45 1.9 1.1 4.2 1.3 6.45 1.45 7.05 2.95 7.65 1.45 9.9 1.3 11.25 1.2 12.1 2.35 13.95 9.05 7.05 10.25 4.2 10.5 1.7 7.45 L1.2 6.4 M9.05 3.25 L9.45 2.65 11.4 2.45 Q10.5 1.4 9.25 1.75 7.85 2.1 8.0 3.1 8.4 3.95 9.05 3.25 M2.45 3.95 L3.2 3.9 Q4.4 2.75 6.5 3.3 6.25 1.95 4.2 1.8 2.9 2.0 2.5 2.55 1.75 3.45 2.45 3.95"
+              fill="#fe0000"
+              fill-rule="evenodd"
+              stroke="none"
+            />
+            <path
+              d="M9.05 3.25 Q8.4 3.95 8.0 3.1 7.85 2.1 9.25 1.75 10.5 1.4 11.4 2.45 L9.45 2.65 9.05 3.25 M2.45 3.95 Q1.75 3.45 2.5 2.55 2.9 2.0 4.2 1.8 6.25 1.95 6.5 3.3 4.4 2.75 3.2 3.9 L2.45 3.95"
+              fill="#ff4e4e"
+              fill-rule="evenodd"
+              stroke="none"
+            />
+            <path
+              d="M12.1 2.35 Q12.7 3.1 13.05 4.45 L12.9 6.4 Q11.8 10.1 7.05 12.7 2.3 10.1 1.2 6.4 0.85 5.45 1.0 4.45 1.9 1.1 4.2 1.3 6.45 1.45 7.05 2.95 7.65 1.45 9.9 1.3 11.25 1.2 12.1 2.35 Z"
+              fill="none"
+              stroke="#000000"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-opacity="0.3019608"
+              stroke-width="0.2"
+            />
+          </g>
+        </svg>
+      </div>
+      <div>
+        <span class="font-semibold">{{ member.current_health }}</span>
+        ({{ (member.current_health/member.total_health*100)|int}}%)
+      </div>
+    </div>
+    <div class="flex flex-row items-center pr-3">
+      <div class="w-6 mr-1">
+        <svg
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          viewbox="0 0 14 14"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M14.0 0.0 L14.0 14.0 0.0 14.0 0.0 0.0 14.0 0.0"
+            fill="#ffffff"
+            fill-opacity="0.0"
+            fill-rule="evenodd"
+            stroke="none"
+          />
+          <path
+            d="M2.05 1.95 L11.9 1.95 Q11.85 9.2 7.0 11.95 L6.95 11.95 Q2.1 9.2 2.05 1.95 M7.0 10.6 Q10.55 8.6 10.55 3.3 L3.4 3.3 Q3.45 8.6 6.95 10.6 L7.0 10.6"
+            fill="#7e66bd"
+            fill-rule="evenodd"
+            stroke="none"
+          />
+          <path
+            d="M7.0 10.6 L6.95 10.6 Q3.45 8.6 3.4 3.3 L10.55 3.3 Q10.55 8.6 7.0 10.6"
+            fill="#43357d"
+            fill-rule="evenodd"
+            stroke="none"
+          />
+          <path
+            d="M2.05 1.95 L11.9 1.95 Q11.85 9.2 7.0 11.95 L6.95 11.95 Q2.1 9.2 2.05 1.95 Z"
+            fill="none"
+            stroke="#000000"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-opacity="0.5019608"
+            stroke-width="0.05"
+          />
+        </svg>
+      </div>
+      <div>{{ member.shield }}</div>
+    </div>
+    <div>{{ member.cadrant }}</div>
+    <div class="flex flex-row w-full space-x-2">
+      <div class="text-right w-1/2">
+        <div>Dégâts</div>
+        <div>Soins</div>
+        <div>Bouclier</div>
+        <div>Vol de vie</div>
+      </div>
+      <div class="text-left text-gray-300 w-1/2">
+        <div>{{ member.damage }}</div>
+        <div>{{ member.healing }}</div>
+        <div>{{ member.shielding }}</div>
+        <div>{{ member.life_steal }}</div>
+      </div>
+    </div>
+
+    {% if member.own %}
+    <button
+      id="dropdownMenuIconHorizontalButton"
+      data-dropdown-toggle="dropdownDotsHorizontal"
+      data-dropdown-offset-distance="20"
+      data-dropdown-offset-skidding="100"
+      data-dropdown-placement="top"
+      class="absolute items-center top-3 left-3 text-sm font-medium text-center text-gray-900 rounded-full hover:bg-zinc-500 p-0.5"
+      type="button"
+    >
+      <svg
+        class="w-6 h-6"
+        aria-hidden="true"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"
+        ></path>
+      </svg>
+    </button>
+    <!-- Dropdown menu -->
+    <div
+      id="dropdownDotsHorizontal"
+      class="z-10 hidden bg-black divide-y divide-gray-100 rounded-lg shadow w-48 border border-zinc-900"
+    >
+      <ul
+        class="p-3 space-y-2 text-sm text-gray-700 dark:text-gray-200"
+        aria-labelledby="dropdownToggleButton"
+      >
+        <li class="flex justify-left items-center">
+          <label
+            class="relative inline-flex items-center cursor-pointer"
+            onclick="toggle_auto_turn('{{member.id}}')"
+          >
+            {% if member.auto_turn %}
+            <input
+              type="checkbox"
+              value=""
+              id="negative-toggle"
+              class="sr-only peer"
+              checked
+            />
+            {% else %}
+            <input
+              type="checkbox"
+              value=""
+              id="negative-toggle"
+              class="sr-only peer"
+            />
+            {% endif %}
+            <div
+              class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-700"
+            ></div>
+            <span class="ml-3 text-sm text-gray-300">Tour automatique</span>
+          </label>
+        </li>
+      </ul>
+    </div>
+    {% endif %} {% endif %}
+  </div>
+  {% endfor %}{% else %}
+  <div>Join a combat to start</div>
+  {% endif %} {% endblock %}
+</div>

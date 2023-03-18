@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html class="w-full h-full select-none">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Karrelage</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}"> -->
+    <link rel="stylesheet" href="..\static\dist\css\output.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.3/flowbite.min.js"></script>
+    <script
+      type="text/javascript"
+      src="http://code.jquery.com/jquery-1.8.0.min.js"
+    ></script>
+    {% block script %}{% endblock %}
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='favicon.ico') }}"
+    />
+  </head>
+  <body
+    class="w-full h-full text-white flex items-center justify-center bg-zinc-900 overflow-x-hidden font-sans font-medium"
+  >
+    <a href="{{url_for('index')}}">
+      <svg
+        version="1.1"
+        id="Layer_1"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        width="50px"
+        height="80px"
+        viewBox="0 0 120 200"
+        class="absolute top-4 left-5 fill-white"
+      >
+        <g class="st0">
+          <path
+            class="st1"
+            d="M40.4,100.3c0,1-0.8,1.7-1.8,1.7H8.3c-0.8,0-1.7-0.7-1.7-1.7s0.8-1.7,1.7-1.7h6V21.4h-5c-1,0-1.8-0.7-1.8-1.7
+      S8.3,18,9.2,18L38,18c1,0,1.8,0.7,1.8,1.7S39,21.4,38,21.4h-5v77.3h5.6C39.6,98.6,40.4,99.4,40.4,100.3z M17.9,98.6h11.5V21.4H17.9
+      V98.6z M86.8,100.3c0,1-0.8,1.7-1.8,1.7H54c-1,0-1.7-0.7-1.7-1.7s0.7-1.7,1.7-1.7h5.9l-25-39.4c-0.2-0.4-0.4-0.7-0.4-1.1
+      c0-0.4,0.1-0.7,0.4-1l28-35.9h-7.7c-1,0-1.7-0.7-1.7-1.7s0.7-1.7,1.7-1.7l20.9,0c1,0,1.7,0.7,1.7,1.7s-0.7,1.7-1.7,1.7h-8.8
+      L48.2,46l33.4,52.7H85C85.9,98.6,86.8,99.4,86.8,100.3z M64.2,98.6h13.3L46,48.8l-7.3,9.6L64.2,98.6z"
+          />
+        </g>
+      </svg>
+    </a>
+    {% block content %} {% endblock %}
+  </body>
+</html>

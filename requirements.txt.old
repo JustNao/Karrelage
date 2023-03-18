@@ -1,0 +1,22 @@
+scapy == 2.4.2
+opencv_python
+requests
+colorama
+pyautogui
+pysimplegui
+pillow
+pywin32
+pywinauto
+openpyxl
+gspread
+oauth2client
+selenium-wire
+selenium
+playsound==1.2.2
+mouse
+flask
+flaskwebgui
+waitress
+gzip
+keyboard
+pygetwindow

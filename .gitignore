@@ -1,0 +1,5 @@
+__pycache__
+.vscode
+config/multicompte.json
+node_modules
+test.*
