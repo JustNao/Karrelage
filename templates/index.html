@@ -1,5 +1,7 @@
 {% extends 'base.html' %} {% block script %}
 <script>
+  let changing = false;
+
   load = async function (module, class_name) {
     const loader = document.getElementById("loader");
     const className = loader.className;
@@ -8,6 +10,16 @@
     await $.post("/load", { module: module, class_name: class_name });
     window.location.href = `/${module}`;
   };
+
+  const switch_type = () => {
+    if (changing) return;
+    setTimeout(function () {
+      changing = false;
+    }, 50);
+    $.post("/switch_type");
+    changing = true;
+  };
+
   window.resizeTo(500, 450);
 </script>
 {% endblock %} {% block content %}
@@ -82,6 +94,34 @@
       </a>
     </div>
     {% endfor %}
+  </div>
+  <div class="flex flex-row mb-4">
+    <span
+      class="relative z-10 text-sm text-gray-300 h-6 mr-3 flex items-center"
+    >
+      Sniffer
+    </span>
+    <label class="relative inline-flex items-center" onclick="switch_type()">
+      {% if type == "sniffer" %}
+      <input
+        type="checkbox"
+        value=""
+        id="negative-toggle"
+        class="sr-only peer"
+      />
+      {% else %}
+      <input
+        type="checkbox"
+        value=""
+        id="negative-toggle"
+        class="sr-only peer"
+      />
+      {% endif %}
+      <div
+        class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-blue-300 rounded-full pee peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-700"
+      ></div>
+      <span class="ml-3 text-sm text-gray-300">Attach</span>
+    </label>
   </div>
 </div>
 <div

@@ -19,7 +19,6 @@ manager = Manager(
         ("HDV Filter", "hdv_filter", "HDVFilter"),
         ("Team Manager", "team_manager", "TeamManager"),
     ],
-    type="attach",
 )
 module = None
 
@@ -28,7 +27,7 @@ module = None
 def index():
     if manager.stop is not None:
         manager.stop()
-    return render_template("index.html", modules=manager.modules)
+    return render_template("index.html", modules=manager.modules, type=manager.type)
 
 
 @app.route("/team_manager")
@@ -122,6 +121,13 @@ def update():
         data = request.form["data"]
         print(data)
         module.update(data)
+    return "ok"
+
+
+@app.route("/switch_type", methods=["GET", "POST"])
+def switch_type():
+    if request.method == "POST":
+        manager.switch_type()
     return "ok"
 
 
