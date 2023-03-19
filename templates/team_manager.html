@@ -25,19 +25,27 @@
   }
 
   data_refresh = setInterval(updater, 500);
-  window.resizeTo(250 + parseInt("{{ team|length * 255 }}"), 600);
+  window.resizeTo(
+    100 + Math.min(parseInt("{{ team|length }}"), 4) * 272,
+    600 + 300 * (Math.ceil(parseInt("{{ team|length }}") / 4) - 1)
+  );
 </script>
 {% endblock %} {% block content %} {% if team|length > 0 %}
-<div class="flex flex-row w-full justify-center items-center" id="team-manager">
+<div
+  class="{% if team|length > 4 %} grid grid-cols-4 {% else %} flex flex-row {% endif %} justify-center items-center"
+  id="team-manager"
+>
   {% for member in team %}
   <div
-    class="relative h-full bg-black border border-black rounded-lg min-w-[15rem] flex flex-col items-center my-20 py-6 mx-4 shadow-xl shadow-black/50"
+    class="relative bg-black border border-black rounded-lg w-[15rem] flex flex-col items-center my-10 py-6 mx-4 shadow-xl shadow-black/50"
   >
     <img
       src="/static/img/classes/{{ member.breed }}_{{ member.sex }}.png"
       class="mb-3 w-24 h-24 border border-black/50 rounded-md"
     />
-    <div class="text-2xl font-semibold">{{member.name}}</div>
+    <div class="text-2xl font-semibold break-words w-full text-center">
+      {{member.name}}
+    </div>
     <div class="text-base text-gray-500 -mt-1 font-semibold">
       {{ member.level }}
     </div>
