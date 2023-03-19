@@ -241,7 +241,6 @@ class TeamManager:
 
         # Necessary to bring window to foreground
         self.shell = win32com.client.Dispatch("WScript.Shell", pythoncom.CoInitialize())
-        self.shell.SendKeys("%")
 
         mouse.on_middle_click(self.all_move)
 
@@ -369,6 +368,7 @@ class TeamManager:
             # If the player has a window registered, we bring it to the foreground
             if player.window is not None:
                 # doesn't work with multithreading
+                self.shell.SendKeys(' ')
                 win32gui.SetForegroundWindow(player.window)
 
         # Stats init
