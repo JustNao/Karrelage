@@ -15,6 +15,7 @@ import random
 from src.utils import packet_handler
 import pygetwindow as gw
 from colorama import Fore
+from .base import DofusModule
 
 DEBUG = False
 
@@ -219,7 +220,7 @@ class Invocation:
         self.summoner.add_life_steal(life_steal)
 
 
-class TeamManager:
+class TeamManager(DofusModule):
     def __init__(self) -> None:
         self.characters = {}
         self.auto_turn = False
@@ -270,9 +271,6 @@ class TeamManager:
         team = self.get_team()
         return hash(json.dumps(team))
 
-    def packetRead(self, msg):
-        self.handle_packet(msg)
-
     def get_player(self, id):
         for player in self.team:
             if player.id == id:
@@ -305,16 +303,6 @@ class TeamManager:
     def send_keystroke(self, window, key=0x56):
         win32api.SendMessage(window, win32con.WM_KEYDOWN, key, 0)
         win32api.SendMessage(window, win32con.WM_KEYUP, key, 0)
-
-    def handle_packet(self, msg):
-        try:
-            name = protocol.msg_from_id[msg.id]["name"]
-        except KeyError:
-            print("Unknown packet id:", msg.id)
-
-        handle = f"handle_{name}"
-        if hasattr(self, handle) and callable(handler := getattr(self, handle)):
-            handler(msg)
 
     @packet_handler
     def handle_GameFightStartingMessage(self, _):
@@ -350,7 +338,7 @@ class TeamManager:
         # If the player has a window registered, we bring it to the foreground
         if player.window is not None:
             self.shell.SendKeys(
-                " "
+                "%"
             )  # Unfocus current window, required for SetForegroundWindow
             win32gui.SetForegroundWindow(player.window)
 

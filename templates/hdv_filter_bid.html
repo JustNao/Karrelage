@@ -82,9 +82,9 @@
   <div
     class="flex flex-col w-full h-fit justify-center items-center bg-black/80 rounded-md px-10 py-6"
   >
-  <div># {{index + 1}} / {{total}}</div>
-  <div class="text-yellow-300">{{ price }} K</div>
-  <div class="self-start">
+    <div># {{index + 1}} / {{total}}</div>
+    <div class="text-yellow-300">{{ price }} K</div>
+    <div class="self-start">
       <div class="flex flex-col w-full mb-2">
         <span class="text-lg"><b>{{name}}</b></span>
         <span class="text-sm text-gray-300 -mt-0.5">Niveau {{level}}</span>
@@ -171,6 +171,14 @@
             <span class="inline-flex items-center pl-3 text-base text-blue-500">
               + {{ effect.value }} {{ effect.name }}
             </span>
+            {% elif effect.operator == '-' %}
+            <!-- NEGATIVE STAT -->
+            <span class="inline-flex items-center pl-3 text-base text-red-700">
+              - {{ effect.value }} {{ effect.name }}
+              <span class="ml-2 text-gray-400">
+                [-{{ effect.max }} à -{{ effect.min }}]
+              </span>
+            </span>
             {% elif effect.value >= effect.max %}
             <!-- PERFECT AND OVER -->
             <span
@@ -191,14 +199,6 @@
               {{ effect.value }} {{ effect.name }}
               <span class="ml-2 text-gray-400">
                 [{{ effect.min }} à {{ effect.max }}]
-              </span>
-            </span>
-            {% elif effect.operator == '-' %}
-            <!-- NEGATIVE STAT -->
-            <span class="inline-flex items-center pl-3 text-base text-red-700">
-              - {{ effect.value }} {{ effect.name }}
-              <span class="ml-2 text-gray-400">
-                [-{{ effect.max }} à -{{ effect.min }}]
               </span>
             </span>
             {% elif effect.value < effect.min %}

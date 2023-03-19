@@ -1,12 +1,13 @@
 from src.sniffer.network import launch_in_thread
 from src.mitm.mitm import launch_mitm
+from src.modules.base import DofusModule
 import importlib
 
 
 class Manager:
     def __init__(self, modules, type="sniffer"):
         self.modules = modules
-        self.current_module = None
+        self.current_module: DofusModule = None
         self.stop = None
         self.type = type
 
@@ -18,10 +19,10 @@ class Manager:
 
     def run(self):
         if self.type == "sniffer":
-            self.stop = launch_in_thread(self.current_module.packetRead)
+            self.stop = launch_in_thread(self.current_module.handle_packet)
             print("Sniffer launched")
         elif self.type == "attach":
-            self.stop = launch_mitm(self.current_module.packetRead)
+            self.stop = launch_mitm(self.current_module.handle_packet)
             print("Bridge launched")
 
     def stop(self):

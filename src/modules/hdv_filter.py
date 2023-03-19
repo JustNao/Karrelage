@@ -2,12 +2,13 @@ import re
 
 from src.entities.effects import effects, idToEffect
 from src.entities.item import items
-from src.sniffer import protocol
 from src.entities.utils import kamasToString
+from src.utils import packet_handler
+from .base import DofusModule
 import keyboard
 
 
-class HDVFilter:
+class HDVFilter(DofusModule):
     # HDV Equipement Filter
 
     def __init__(self) -> None:
@@ -161,27 +162,23 @@ class HDVFilter:
 
         self.releventBids.sort(key=lambda x: x["prices"][0])
 
-    def packetRead(self, msg):
-        name = protocol.msg_from_id[msg.id]["name"]
-        if name == "ExchangeTypesItemsExchangerDescriptionForUserMessage":
-            packet = protocol.readMsg(msg)
-            # os.system('CLS')
-            if packet is None:
-                return
+    @packet_handler
+    def handle_ExchangeTypesItemsExchangerDescriptionForUserMessage(self, packet):
+        """Triggered when the user clicks on an item in the HDV"""
 
-            self.reset()
-            self.item = items[packet["objectGID"]]
-            for bid in packet["itemTypeDescriptions"]:
-                self.bids.append(bid)
-            print("Found", len(self.bids), "bids for", self.item["name"])
+        self.reset()
+        self.item = items[packet["objectGID"]]
+        for bid in packet["itemTypeDescriptions"]:
+            self.bids.append(bid)
+        print("Found", len(self.bids), "bids for", self.item["name"])
 
-            self.item["effects"] = {}
-            for effect in self.item["possibleEffects"]:
-                operator = effects(effect["effectId"])["operator"]
-                if operator != "null":
-                    self.item["effects"][effect["effectId"]] = {
-                        "min": effect["diceNum"],
-                        "max": effect["diceSide"],
-                        "type": self.fullEffect(effect["effectId"]),
-                        "operator": operator,
-                    }
+        self.item["effects"] = {}
+        for effect in self.item["possibleEffects"]:
+            operator = effects(effect["effectId"])["operator"]
+            if operator != "null":
+                self.item["effects"][effect["effectId"]] = {
+                    "min": effect["diceNum"],
+                    "max": effect["diceSide"],
+                    "type": self.fullEffect(effect["effectId"]),
+                    "operator": operator,
+                }
