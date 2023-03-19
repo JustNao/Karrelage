@@ -26,7 +26,7 @@
 
   data_refresh = setInterval(updater, 500);
   window.resizeTo(
-    100 + Math.min(parseInt("{{ team|length }}"), 4) * 272,
+    100 + Math.max(Math.min(parseInt("{{ team|length }}"), 4) * 272, 150),
     600 + 300 * (Math.ceil(parseInt("{{ team|length }}") / 4) - 1)
   );
 </script>
