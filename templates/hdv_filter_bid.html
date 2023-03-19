@@ -34,7 +34,7 @@
   }
   window.resizeTo(600, 350 + parseInt("{{ effects|length * 30 }}"));
 </script>
-{% endblock %} {% block content %} {% if effects is not none %}
+{% endblock %} {% block content %} {% if effects|length > 0 %}
 <div class="flex flex-col h-full items-center">
   <div class="flex justify-center my-6">
     <a href="{{url_for('hdv_filter_bid', index=((index-1)%total))}}">
@@ -246,18 +246,11 @@
     <div
       class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-700"
     ></div>
-    <span class="ml-3 text-sm font-medium text-gray-300">Negative stats</span>
+    <span class="ml-3 text-sm font-medium text-gray-300">Stats négatives</span>
   </label>
 </div>
 {% else %}
-<div class="flex flex-col h-full min-w-[420px]">
-  <div
-    class="flex flex-col w-full h-fit justify-center items-center bg-black/80 rounded-md py-3 mt-10"
-  >
-    <div>No bids found with your filters</div>
-  </div>
-</div>
-
+<div>Aucune vente ne satisfait vos conditions</div>
 {% endif %}
 <div class="absolute left-10 bottom-5 top-auto">
   <a href="{{url_for('hdv_filter')}}">
@@ -265,7 +258,7 @@
       type="button"
       class="text-gray-300 hover:text-white border border-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
     >
-      Back
+      Retour
     </button>
   </a>
 </div>

@@ -12,6 +12,29 @@
     });
   }
   data_refresh = setInterval(updater, 500);
+
+  function toggle_stat(stat) {
+    const stats = ["PA", "PM", "PO"];
+
+    input = document.querySelector("#input-" + stat);
+    input.value = (parseInt(input.value) + 1) % 2;
+
+    button = document.querySelector("#button-" + stat);
+    button.classList.toggle("bg-green-700");
+    button.classList.toggle("hover:bg-green-700");
+
+    stats.forEach((s) => {
+      if (s != stat) {
+        input = document.querySelector("#input-" + s);
+        input.value = 0;
+
+        button = document.querySelector("#button-" + s);
+        button.classList.remove("bg-green-700");
+        button.classList.remove("hover:bg-green-700");
+      }
+    });
+  }
+
   window.resizeTo(600, 250 + parseInt("{{ content|length * 38 }}"));
 </script>
 {% endblock %} {% block content %} {% if (content|length) > 0 %}
@@ -56,12 +79,38 @@
     </div>
     {% endfor %}
   </div>
-  <div class="mt-6 flex justify-center">
+  <div class="flex flex-row space-x-2 mt-3">
+    <input hidden type="number" name="111" value="0" id="input-PA">
+    <div
+      class="text-white border border-gray-300 focus:outline-none cursor-pointer hover:bg-gray-700 focus:ring-4 font-medium rounded-lg text-sm px-2 py-1"
+      onclick="toggle_stat('PA')"
+      id="button-PA"
+      >
+      +1 PA
+    </div>
+    <input hidden type="number" name="128" value="0" id="input-PM">
+    <div
+      class="text-white border border-gray-300 focus:outline-none cursor-pointer hover:bg-gray-700 focus:ring-4 font-medium rounded-lg text-sm px-2 py-1"
+      onclick="toggle_stat('PM')"
+      id="button-PM"
+    >
+      +1 PM
+    </div>
+    <input hidden type="number" name="117" value="0" id="input-PO">
+    <div
+      class="text-white border border-gray-300 focus:outline-none cursor-pointer hover:bg-gray-700 focus:ring-4 font-medium rounded-lg text-sm px-2 py-1"
+      onclick="toggle_stat('PO')"
+      id="button-PO"
+    >
+      +1 PO
+    </div>
+  </div>
+  <div class="mt-3 flex justify-center">
     <button
       type="submit"
-      class="text-white bg-gray-900 border border-gray-300 focus:outline-none hover:bg-gray-700 focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
+      class="text-white border border-gray-300 focus:outline-none hover:bg-gray-700 focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
     >
-      Filter
+      Afficher les ventes
     </button>
   </div>
 </form>

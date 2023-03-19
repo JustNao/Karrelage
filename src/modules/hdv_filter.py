@@ -55,7 +55,7 @@ class HDVFilter(DofusModule):
 
     def get_bid(self, index):
         if len(self.releventBids) == 0:
-            return None, None
+            return [], 0
 
         bid = self.releventBids[index]
 
@@ -129,17 +129,11 @@ class HDVFilter(DofusModule):
 
         characFilter = {}
         for effect, value in filt.items():
-            if value != "":
+            if value != "" and value != "0" and int(effect) not in characFilter:
                 characFilter[int(effect)] = {
                     "value": int(value),
                     "diff": 0,
                 }
-        # for exo in ('PA', 'PM', 'PO'):
-        #     if filt[f'HIDDEN-{exo}'] != '':
-        #         characFilter[int(filt[f'HIDDEN-{exo}'])] = {
-        #             'value': 1,
-        #             'diff': 0,
-        #         }
 
         for bid in self.bids:
             valid = True

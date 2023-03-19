@@ -92,7 +92,8 @@
         ({{ (member.current_health/member.total_health*100)|int}}%)
       </div>
     </div>
-    <div class="flex flex-row items-center pr-3">
+    <!-- Member shield, disabled because it's a pain in the ass to manage -->
+    <!-- <div class="flex flex-row items-center pr-3">
       <div class="w-6 mr-1">
         <svg
           xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -130,7 +131,7 @@
         </svg>
       </div>
       <div>{{ member.shield }}</div>
-    </div>
+    </div> -->
     <div>{{ member.cadrant }}</div>
     <div class="flex flex-row w-full space-x-2">
       <div class="text-right w-1/2">
