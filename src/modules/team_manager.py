@@ -12,6 +12,7 @@ from src.entities.stats import idToStat
 import numpy as np
 from time import sleep
 import random
+from src.utils import packet_handler
 import pygetwindow as gw
 from colorama import Fore
 
@@ -79,13 +80,13 @@ class Player:
                     "old": 0,
                 }
 
-        # TODO: Need to look at why this is needed
         # Total health is (health from equipement + health from level + health from bonuses)
         temp_total_health = (
             self.stats[11]["current"]
             + self.stats[0]["current"]
             + self.stats[95]["current"]
         )
+        # TODO: Need to look at why this is needed
         if temp_total_health > 0:
             self.total_health = temp_total_health
 
@@ -155,15 +156,6 @@ class Player:
             # Updating out of combat lost health
             if id == 97:
                 self.current_health += self.stats[id]["current"] - self.stats[id]["old"]
-
-            print(
-                "Updated player's",
-                self.name,
-                "stat",
-                self.stats[id]["name"],
-                "to",
-                self.stats[id]["current"],
-            )
 
     def update_health(self, update):
         if "loss" in update:
@@ -279,267 +271,7 @@ class TeamManager:
         return hash(json.dumps(team))
 
     def packetRead(self, msg):
-        name = protocol.msg_from_id[msg.id]["name"]
-
-        if name == "GameFightUpdateTeamMessage":
-            packet = protocol.readMsg(msg)
-            if packet is None:
-                return
-            if DEBUG:
-                self.save_packet(packet)
-
-            own_team = False
-            for member in packet["team"]["teamMembers"]:
-                # Monster group
-                if "name" not in member:
-                    return
-
-                if any(member["name"] == x for x in self.player_characters):
-                    own_team = True
-                    break
-
-            if not own_team:
-                return
-
-            for member in packet["team"]["teamMembers"]:
-                window = None
-
-                # If not a player or already in team
-                if self.get_player(member["id"]) is not None:
-                    continue
-
-                # If the member is a companion (e.g. Lumino)
-                # We count it as an invocation
-                if "masterId" in member:
-                    self.team.append(
-                        Invocation(member["id"], self.get_player(member["masterId"]))
-                    )
-                    return
-
-                # Get the correspond window if we are playing the character
-                if any(member["name"] == x for x in self.player_characters):
-                    window = self.get_window(member["name"])
-
-                # New team member
-                if self.get_player(member["id"]) is None:
-                    if self.buffer_team.get(member["id"]) is not None:
-                        player = self.buffer_team[member["id"]]
-                        del self.buffer_team[member["id"]]
-                    else:
-                        if "breed" not in member:
-                            player = Player(
-                                id=member["id"],
-                                name=member["name"],
-                                window=window,
-                                level=member["level"],
-                            )
-                        else:
-                            player = Player(
-                                id=member["id"],
-                                name=member["name"],
-                                window=window,
-                                level=member["level"],
-                                breed=member["breed"],
-                                sex=int(member["sex"]),
-                            )
-
-                    self.team.append(player)
-
-        # Turn start
-        elif name == "GameFightTurnStartMessage":
-            packet = protocol.readMsg(msg)
-            if packet is None:
-                return
-
-            if DEBUG:
-                self.save_packet(packet)
-
-            player_id = packet["id"]
-            player = self.get_player(player_id)
-
-            if player is None or isinstance(player, Invocation):
-                return
-            # If the player is in the team and not an invocation
-
-            if player.auto_turn:
-                sleep(random.uniform(0.2, 0.8))
-                self.send_keystroke(player.window, 0x56)
-
-            # If the player has a window registered, we bring it to the foreground
-            if player.window is not None:
-                # doesn't work with multithreading
-                self.shell.SendKeys(' ')
-                win32gui.SetForegroundWindow(player.window)
-
-        # Stats init
-        elif name == "GameFightShowFighterMessage":
-            packet = protocol.readMsg(msg)
-            if packet is None:
-                return
-
-            if DEBUG:
-                self.save_packet(packet)
-
-            fighter = packet["informations"]
-
-            # If the fighter is a monster group, abort
-            if "name" not in fighter:
-                return
-
-            # If the fighter is not in the team yet
-            if fighter["contextualId"] not in [x.id for x in self.team]:
-                window = None
-                if any(fighter["name"] == x for x in self.player_characters):
-                    window = self.get_window(fighter["name"])
-                new_player = Player(
-                    id=fighter["contextualId"],
-                    name=fighter["name"],
-                    window=window,
-                    level=fighter["level"],
-                    breed=fighter["breed"],
-                    sex=int(fighter["sex"]),
-                )
-                new_player.set_stats(
-                    fighter["stats"]["characteristics"]["characteristics"]
-                )
-                self.buffer_team[fighter["contextualId"]] = new_player
-            # The fighter is already in the team but has not been initialized yet
-            else:
-                team_player = self.get_player(fighter["contextualId"])
-                if team_player is None:
-                    return
-
-                team_player.initialize(fighter)
-
-        # Stats update
-        elif name == "RefreshCharacterStatsMessage":
-            packet = protocol.readMsg(msg)
-            if packet is None:
-                return
-
-            fighter = self.get_player(packet["fighterId"])
-            # If the fighter is not in the team or is an invocation, abort
-            if fighter is None or isinstance(fighter, Invocation):
-                return
-
-            if DEBUG:
-                self.save_packet(packet)
-
-            fighter.update_stat(packet["stats"]["characteristics"]["characteristics"])
-
-        # Health update
-        elif name == "GameActionFightLifePointsLostMessage":
-            packet = protocol.readMsg(msg)
-            if packet is None:
-                return
-
-            target_player = self.get_player(packet["targetId"])
-            # If the target is in the team and not an invocation, update his health
-            if target_player is not None and not isinstance(target_player, Invocation):
-                target_player.update_health(packet)
-                return
-
-            source_player = self.get_player(packet["sourceId"])
-            # If the source is in the team, add the damage to his damage counter
-            if source_player is not None:
-                if "loss" in packet:
-                    source_player.add_damage(packet["loss"])
-                elif "delta" in packet:
-                    source_player.add_damage(packet["delta"])
-
-        elif name == "GameActionFightLifeAndShieldPointsLostMessage":
-            packet = protocol.readMsg(msg)
-            if packet is None:
-                return
-
-            target_player = self.get_player(packet["targetId"])
-            # If the target is in the team and not an invocation, update his health
-            if target_player is not None and not isinstance(target_player, Invocation):
-                target_player.update_health(packet)
-                return
-
-            source_player = self.get_player(packet["sourceId"])
-            # If the source is in the team, add the damage to his damage counter
-            if source_player is not None:
-                source_player.add_damage(packet["loss"] + packet["shieldLoss"])
-
-        elif name == "GameActionFightLifePointsGainMessage":
-            packet = protocol.readMsg(msg)
-            if packet is None:
-                return
-
-            if packet["targetId"] == packet["sourceId"]:
-                source_player = self.get_player(packet["sourceId"])
-                # If the source is the target, it's life steal
-                # TODO: Check how self heal and life steal differ
-                if source_player is not None:
-                    if "delta" in packet:
-                        source_player.add_life_steal(packet["delta"])
-
-            target_player = self.get_player(packet["targetId"])
-            # If the target is in the team and not an invocation, update his health
-            if target_player is not None and not isinstance(target_player, Invocation):
-                target_player.update_health(packet)
-                if DEBUG:
-                    self.save_packet(packet)
-
-                return
-
-            source_player = self.get_player(packet["sourceId"])
-            # If the source is in the team, add the healing to his healing counter
-            if source_player is not None:
-                source_player.add_healing(packet["delta"])
-
-        # Fight start
-        elif name == "GameFightStartingMessage":
-            if not self.fighting:
-                self.team = []
-                self.buffer_team = {}
-                self.fighting = True
-            pass
-
-        elif name == "GameFightEndMessage":
-            self.fighting = False
-        # Add invocations to the team
-        elif name == "GameActionFightMultipleSummonMessage":
-            packet = protocol.readMsg(msg)
-            if packet is None:
-                return
-
-            if DEBUG:
-                self.save_packet(packet)
-
-            source_player = self.get_player(packet["sourceId"])
-            # If the summoner is not in the team, abort
-            if source_player is None:
-                return
-
-            invoc = Invocation(
-                id=packet["summons"][0]["summons"][0]["informations"]["contextualId"],
-                summoner=source_player,
-            )
-            self.team.append(invoc)
-
-        elif name == "GameActionFightDispellableEffectMessage":
-            packet = protocol.readMsg(msg)
-            if packet is None:
-                return
-
-            if DEBUG:
-                self.save_packet(packet)
-
-            # Only shields
-            if packet["actionId"] != 1040:
-                return
-
-            source_player = self.get_player(packet["sourceId"])
-            if source_player is None:
-                return
-
-            source_player.add_shielding(packet["effect"]["delta"])
-
-        elif name == "ObjectAveragePricesMessage":
-            self.save_packet(protocol.readMsg(msg))
+        self.handle_packet(msg)
 
     def get_player(self, id):
         for player in self.team:
@@ -573,3 +305,255 @@ class TeamManager:
     def send_keystroke(self, window, key=0x56):
         win32api.SendMessage(window, win32con.WM_KEYDOWN, key, 0)
         win32api.SendMessage(window, win32con.WM_KEYUP, key, 0)
+
+    def handle_packet(self, msg):
+        try:
+            name = protocol.msg_from_id[msg.id]["name"]
+        except KeyError:
+            print("Unknown packet id:", msg.id)
+
+        handle = f"handle_{name}"
+        if hasattr(self, handle) and callable(handler := getattr(self, handle)):
+            handler(msg)
+
+    @packet_handler
+    def handle_GameFightStartingMessage(self, _):
+        """Triggered when the fight starts."""
+
+        if not self.fighting:
+            self.team = []
+            self.buffer_team = {}
+            self.fighting = True
+
+    @packet_handler
+    def handle_GameFightEndMessage(self, _):
+        """Triggered when the fight ends."""
+
+        self.fighting = False
+
+    @packet_handler
+    def handle_GameFightTurnStartMessage(self, packet):
+        """Triggered when the turn starts for any entity in the combat."""
+
+        player_id = packet["id"]
+        player = self.get_player(player_id)
+
+        # If the player is not in the team or an invocation, abort
+        if player is None or isinstance(player, Invocation):
+            return
+
+        if player.auto_turn:
+            sleep(random.uniform(0.2, 0.8))
+            self.send_keystroke(player.window, 0x56)
+            return
+
+        # If the player has a window registered, we bring it to the foreground
+        if player.window is not None:
+            self.shell.SendKeys(
+                " "
+            )  # Unfocus current window, required for SetForegroundWindow
+            win32gui.SetForegroundWindow(player.window)
+
+    @packet_handler
+    def handle_GameFightShowFighterMessage(self, packet):
+        """Triggered when an entity is added to the combat.
+
+        Here we use a buffer team to store our players, because the next
+        packet informing us in which team the entity is will not contain
+        the player's stats.
+        """
+
+        fighter = packet["informations"]
+
+        # If the fighter is a monster group, abort
+        if "name" not in fighter:
+            return
+
+        # If the fighter is not in the team yet
+        if fighter["contextualId"] not in [x.id for x in self.team]:
+            window = None
+
+            # If fighter is controlled by us, we get the window
+            if any(fighter["name"] == x for x in self.player_characters):
+                window = self.get_window(fighter["name"])
+
+            new_player = Player(
+                id=fighter["contextualId"],
+                name=fighter["name"],
+                window=window,
+                level=fighter["level"],
+                breed=fighter["breed"],
+                sex=int(fighter["sex"]),
+            )
+
+            new_player.set_stats(fighter["stats"]["characteristics"]["characteristics"])
+            self.buffer_team[
+                fighter["contextualId"]
+            ] = new_player  # Storing in buffer_team until we are sure it's our own team
+
+        # The fighter is already in the team but has not been initialized yet
+        else:
+            team_player = self.get_player(fighter["contextualId"])
+            if team_player is None:
+                return
+
+            team_player.initialize(fighter)
+
+    @packet_handler
+    def handle_GameFightUpdateTeamMessage(self, packet):
+        """Triggered when the team is updated."""
+
+        own_team = False
+        for member in packet["team"]["teamMembers"]:
+            # If it's a monster group, abort
+            if "name" not in member:
+                return
+
+            # If our own character is in the team, we continue
+            if any(member["name"] == x for x in self.player_characters):
+                own_team = True
+                break
+
+        if not own_team:
+            return
+
+        for member in packet["team"]["teamMembers"]:
+            # If not a player or already in team
+            if self.get_player(member["id"]) is not None:
+                continue
+
+            # If the member is a companion (e.g. Lumino)
+            # We count it as an invocation
+            if "masterId" in member:
+                self.team.append(
+                    Invocation(member["id"], self.get_player(member["masterId"]))
+                )
+                continue
+
+            # New team member
+            if self.get_player(member["id"]) is None:
+                window = self.get_window(member["name"])
+
+                if self.buffer_team.get(member["id"]) is not None:
+                    # If the player is in the buffer, we use it
+                    player = self.buffer_team[member["id"]]
+                    del self.buffer_team[member["id"]]
+
+                else:
+                    if "breed" not in member:
+                        player = Player(
+                            id=member["id"],
+                            name=member["name"],
+                            window=window,
+                            level=member["level"],
+                        )
+                    else:
+                        player = Player(
+                            id=member["id"],
+                            name=member["name"],
+                            window=window,
+                            level=member["level"],
+                            breed=member["breed"],
+                            sex=int(member["sex"]),
+                        )
+
+                self.team.append(player)
+
+    @packet_handler
+    def handle_RefreshCharacterStatsMessage(self, packet):
+        """Triggered when the stats of an entity are updated."""
+
+        fighter = self.get_player(packet["fighterId"])
+
+        # If the fighter is not in the team or is an invocation, abort
+        if fighter is None or isinstance(fighter, Invocation):
+            return
+
+        fighter.update_stat(packet["stats"]["characteristics"]["characteristics"])
+
+    @packet_handler
+    def handle_GameActionFightLifePointsLostMessage(self, packet):
+        """Triggered when an entity loses health points."""
+
+        target_player = self.get_player(packet["targetId"])
+
+        # If the target is in the team and not an invocation, update his health
+        if target_player is not None and not isinstance(target_player, Invocation):
+            target_player.update_health(packet)
+            return
+
+        source_player = self.get_player(packet["sourceId"])
+        # If the source is in the team, add the damage to his damage counter
+        if source_player is not None:
+            if "loss" in packet:
+                source_player.add_damage(packet["loss"])
+            elif "delta" in packet:
+                source_player.add_damage(packet["delta"])
+
+    @packet_handler
+    def handle_GameActionFightLifeAndShieldPointsLostMessage(self, packet):
+        """Triggered when an entity gets damaged while having a shield."""
+
+        # If the target is in the team and not an invocation, update his health
+        target_player = self.get_player(packet["targetId"])
+        if target_player is not None and not isinstance(target_player, Invocation):
+            target_player.update_health(packet)
+            return
+
+        # If the source is in the team, add the damage to his damage counter
+        source_player = self.get_player(packet["sourceId"])
+        if source_player is not None:
+            source_player.add_damage(packet["loss"] + packet["shieldLoss"])
+
+    @packet_handler
+    def handle_GameActionFightLifePointsGainMessage(self, packet):
+        """Triggered when an entity gains health points."""
+
+        if packet["targetId"] == packet["sourceId"]:
+            source_player = self.get_player(packet["sourceId"])
+            # If the source is the target, it's life steal
+            # TODO: Check how self heal and life steal differ
+            if source_player is not None:
+                if "delta" in packet:
+                    source_player.add_life_steal(packet["delta"])
+
+        # If the target is in the team and not an invocation, update his health
+        target_player = self.get_player(packet["targetId"])
+        if target_player is not None and not isinstance(target_player, Invocation):
+            target_player.update_health(packet)
+            return
+
+        # If the source is in the team, add the healing to his healing counter
+        source_player = self.get_player(packet["sourceId"])
+        if source_player is not None:
+            source_player.add_healing(packet["delta"])
+
+    @packet_handler
+    def handle_GameActionFightDispellableEffectMessage(self, packet):
+        """Triggered when an entity gets a dispellable buff/debuff."""
+
+        # Only shields
+        # TODO: fix shielding
+        if packet["actionId"] != 1040:
+            return
+
+        source_player = self.get_player(packet["sourceId"])
+        if source_player is None:
+            return
+
+        source_player.add_shielding(packet["effect"]["delta"])
+
+    @packet_handler
+    def handle_GameActionFightMultipleSummonMessage(self, packet):
+        """Triggered when an entity summons one or multiple entities."""
+
+        # If the summoner is not in the team, abort
+        source_player = self.get_player(packet["sourceId"])
+        if source_player is None:
+            return
+
+        invoc = Invocation(
+            id=packet["summons"][0]["summons"][0]["informations"]["contextualId"],
+            summoner=source_player,
+        )
+        self.team.append(invoc)
