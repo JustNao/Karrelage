@@ -1,23 +1,18 @@
-import json
-import re
-
-import pythoncom
-import win32com.client
-from src.sniffer import protocol
-from win32 import win32gui
-import pyautogui as ag
-import win32gui, win32api, win32con
-import mouse
 from src.entities.stats import idToStat
-import numpy as np
-from time import sleep
-import random
 from src.utils import packet_handler
-import pygetwindow as gw
-from colorama import Fore
 from .base import DofusModule
 
-DEBUG = False
+from time import sleep
+from win32 import win32gui
+import json
+import re
+import win32com.client
+import pythoncom
+import pyautogui as ag
+import win32api, win32con
+import mouse
+import numpy as np
+import random
 
 
 def check(value):

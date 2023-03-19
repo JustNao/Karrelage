@@ -1,4 +1,3 @@
-from src.utils import packet_handler
 from src.sniffer import protocol
 
 
