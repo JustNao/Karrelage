@@ -22,7 +22,7 @@ class Manager:
             self.stop = launch_in_thread(self.current_module.handle_packet)
             print("Sniffer launched")
         elif self.type == "attach":
-            self.stop = launch_mitm(self.current_module.handle_packet)
+            self.stop = launch_mitm(self.current_module.handle_packet).shutdown
             print("Bridge launched")
 
     def stop(self):
