@@ -227,9 +227,6 @@ class TeamManager(DofusModule):
         self.buffer = []
         self.fighting = False
 
-        # Necessary to bring window to foreground
-        self.shell = win32com.client.Dispatch("WScript.Shell", pythoncom.CoInitialize())
-
         mouse.on_middle_click(self.all_move)
 
         try:
@@ -332,10 +329,16 @@ class TeamManager(DofusModule):
 
         # If the player has a window registered, we bring it to the foreground
         if player.window is not None:
-            self.shell.SendKeys(
-                "%"
-            )  # Unfocus current window, required for SetForegroundWindow
-            win32gui.SetForegroundWindow(player.window)
+            try:
+                shell = win32com.client.Dispatch(
+                    "WScript.Shell", pythoncom.CoInitialize()
+                )
+                shell.SendKeys(
+                    "%"
+                )  # Send alt to shell, required for SetForegroundWindow
+                win32gui.SetForegroundWindow(player.window)
+            except:
+                pass
 
     @packet_handler
     def handle_GameFightShowFighterMessage(self, packet):
