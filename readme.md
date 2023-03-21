@@ -107,6 +107,7 @@ Vous pouvez ensuite bouger entre chaque vente. Le module affichera les caractér
 <a name="module-team-manager"></a>
 
 Ce module est un outil multicompte combiné à un récap d'équipe.
+
 - Récap d'équipe : en entrée de combat, il affiche tous les membres de l'équipe, et compatibilise tout au long du combat les dégâts infligés, soins/bouclier envoyés et vols de vie appliqués.
 - Partie multicompte : détecte les personnages de l'équipe que vous jouez. A chaque début de tour d'un jour, il met au premier plan le personnage en question (pas besoin de Alt+Tab). Il est possible de mettre dans le fichier `config/multicompte.json` les noms des personnages que vous jouez, ce qui activera la fonctionnalité de clic partagé (un clic milieu de la souris envoie un clic gauche sur tous les personnages de l'équipe à la même position). Il y'a aussi une option sur chacun de vos personnages d'activer un mode "Passe tour automatique", qui au lieu d'ouvrir la fenetre en début de tour, va envoyer la touche `V` (qui pour moi fait passer le tour) même en arrière plan (mater un film pendant un PL sasa par exemple). Faites juste attention à ne pas avoir un challenge qui vous demande d'effectuer une action avant de passer, car le passage de tour est instant.
 
@@ -139,6 +140,7 @@ Plus délicat à lancer, il faut qu'il arrive à intercepter la connexion client
 <a name="dev"></a>
 
 Commande pour lancer l'auto-compilation du CSS par TailwindCSS (nécessite `NodeJS`):
+
 ```sh
 npx tailwindcss -i ./static/src/input.css -o ./static/dist/css/output.css --watch
 ```
@@ -161,5 +163,6 @@ Merci à [LaBot](https://github.com/louisabraham/LaBot) pour son reader/writer d
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
 [menu-screenshot]: https://i.postimg.cc/kXNcDRHP/Screenshot-2023-03-21-183926.png
+[team-screenshot]: https://i.postimg.cc/mkMQQgW0/Screenshot-2023-03-21-183926.png
 [hdv-screenshot]: https://i.postimg.cc/7Yk5d8cV/Screenshot-2023-03-21-183619.png
 [hdv-screenshot2]: https://i.postimg.cc/cLGBFbMy/Screenshot-2023-03-21-183925.png
