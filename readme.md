@@ -94,7 +94,7 @@ Le menu de Karrelage permet de sélectionner quel module lancer. Actuellement, u
 
 <a name="module-hdv"></a>
 
-Ce module sert à filtrer les ventes d'équipements en HDV. En sélectionnant un item en HDV, ses charactéristiques sont affichées sur l'interface de Karrelage. Vous pouvez ensuite spécifier des valeurs minimums pour chaque caractéristique, et le module ne vous affichera que les ventes qui correspondent à ces valeurs.
+Ce module sert à filtrer les ventes d'équipements en HDV. En sélectionnant un item en HDV, ses caractéristiques sont affichées sur l'interface de Karrelage. Vous pouvez ensuite spécifier des valeurs minimums pour chaque caractéristique, et le module ne vous affichera que les ventes qui correspondent à ces valeurs. Vous pouvez aussi rapidement ajouter un exo PA/PM/PO par les boutons.
 
 [![HDV Filter Screenshot][hdv-screenshot]](https://example.com)
 
@@ -108,7 +108,7 @@ Vous pouvez ensuite bouger entre chaque vente. Le module affichera les caractér
 
 Ce module est un outil multicompte combiné à un récap d'équipe.
 - Récap d'équipe : en entrée de combat, il affiche tous les membres de l'équipe, et compatibilise tout au long du combat les dégâts infligés, soins/bouclier envoyés et vols de vie appliqués.
-- Partie multicompte : détecte les personnages de l'équipe que vous jouez. A chaque début de tour d'un jour, il met au premier plan le personnage en question (pas besoin de Alt+Tab). Il est possible de mettre dans le fichier `config/multicompte.json` les noms des personnages que vous jouez, ce qui activera la fonctionnalité de clic partagé (un clic milieu de la souris envoie un clic gauche sur tous les personnages de l'équipe à la même position). Il y'a aussi une option sur chacun de vos personnages d'activer un mode "Passe tour automatique", qui au lieu d'ouvrir la fenetre en début de tour, va envoyer la touche `V` (qui pour moi fait passer le tour).
+- Partie multicompte : détecte les personnages de l'équipe que vous jouez. A chaque début de tour d'un jour, il met au premier plan le personnage en question (pas besoin de Alt+Tab). Il est possible de mettre dans le fichier `config/multicompte.json` les noms des personnages que vous jouez, ce qui activera la fonctionnalité de clic partagé (un clic milieu de la souris envoie un clic gauche sur tous les personnages de l'équipe à la même position). Il y'a aussi une option sur chacun de vos personnages d'activer un mode "Passe tour automatique", qui au lieu d'ouvrir la fenetre en début de tour, va envoyer la touche `V` (qui pour moi fait passer le tour) même en arrière plan (mater un film pendant un PL sasa par exemple). Faites juste attention à ne pas avoir un challenge qui vous demande d'effectuer une action avant de passer, car le passage de tour est instant.
 
 [![Team Manager Screenshot][team-screenshot]](https://example.com)
 
