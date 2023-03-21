@@ -10,4 +10,8 @@ class DofusModule:
 
         handle = f"handle_{name}"
         if hasattr(self, handle) and callable(handler := getattr(self, handle)):
-            handler(msg)
+            packet = protocol.readMsg(msg)
+            if packet is None:
+                return
+
+            handler(packet)

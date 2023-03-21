@@ -1,5 +1,4 @@
 from src.entities.stats import idToStat
-from src.utils import packet_handler
 from .base import DofusModule
 
 from time import sleep
@@ -296,7 +295,6 @@ class TeamManager(DofusModule):
         win32api.SendMessage(window, win32con.WM_KEYDOWN, key, 0)
         win32api.SendMessage(window, win32con.WM_KEYUP, key, 0)
 
-    @packet_handler
     def handle_GameFightStartingMessage(self, _):
         """Triggered when the fight starts."""
 
@@ -305,13 +303,11 @@ class TeamManager(DofusModule):
             self.buffer_team = {}
             self.fighting = True
 
-    @packet_handler
     def handle_GameFightEndMessage(self, _):
         """Triggered when the fight ends."""
 
         self.fighting = False
 
-    @packet_handler
     def handle_GameFightTurnStartMessage(self, packet):
         """Triggered when the turn starts for any entity in the combat."""
 
@@ -340,7 +336,6 @@ class TeamManager(DofusModule):
             except:
                 pass
 
-    @packet_handler
     def handle_GameFightShowFighterMessage(self, packet):
         """Triggered when an entity is added to the combat.
 
@@ -385,7 +380,6 @@ class TeamManager(DofusModule):
 
             team_player.initialize(fighter)
 
-    @packet_handler
     def handle_GameFightUpdateTeamMessage(self, packet):
         """Triggered when the team is updated."""
 
@@ -445,7 +439,6 @@ class TeamManager(DofusModule):
 
                 self.team.append(player)
 
-    @packet_handler
     def handle_RefreshCharacterStatsMessage(self, packet):
         """Triggered when the stats of an entity are updated."""
 
@@ -457,7 +450,6 @@ class TeamManager(DofusModule):
 
         fighter.update_stat(packet["stats"]["characteristics"]["characteristics"])
 
-    @packet_handler
     def handle_GameActionFightLifePointsLostMessage(self, packet):
         """Triggered when an entity loses health points."""
 
@@ -476,7 +468,6 @@ class TeamManager(DofusModule):
             elif "delta" in packet:
                 source_player.add_damage(packet["delta"])
 
-    @packet_handler
     def handle_GameActionFightLifeAndShieldPointsLostMessage(self, packet):
         """Triggered when an entity gets damaged while having a shield."""
 
@@ -491,7 +482,6 @@ class TeamManager(DofusModule):
         if source_player is not None:
             source_player.add_damage(packet["loss"] + packet["shieldLoss"])
 
-    @packet_handler
     def handle_GameActionFightLifePointsGainMessage(self, packet):
         """Triggered when an entity gains health points."""
 
@@ -514,7 +504,6 @@ class TeamManager(DofusModule):
         if source_player is not None:
             source_player.add_healing(packet["delta"])
 
-    @packet_handler
     def handle_GameActionFightDispellableEffectMessage(self, packet):
         """Triggered when an entity gets a dispellable buff/debuff."""
 
@@ -529,7 +518,6 @@ class TeamManager(DofusModule):
 
         source_player.add_shielding(packet["effect"]["delta"])
 
-    @packet_handler
     def handle_GameActionFightMultipleSummonMessage(self, packet):
         """Triggered when an entity summons one or multiple entities."""
 

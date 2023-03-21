@@ -3,7 +3,6 @@ import re
 from src.entities.effects import effects, idToEffect
 from src.entities.item import items
 from src.entities.utils import kamasToString
-from src.utils import packet_handler
 from .base import DofusModule
 import keyboard
 
@@ -156,7 +155,6 @@ class HDVFilter(DofusModule):
 
         self.releventBids.sort(key=lambda x: x["prices"][0])
 
-    @packet_handler
     def handle_ExchangeTypesItemsExchangerDescriptionForUserMessage(self, packet):
         """Triggered when the user clicks on an item in the HDV"""
 
