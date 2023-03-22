@@ -161,18 +161,6 @@ class Player:
             self.current_health += update["delta"]
         print("Updated player's", self.name, "health to", self.current_health)
 
-        percent = self.current_health / self.total_health * 100
-        if percent >= 90:
-            self.cadrant = "90° horaire"
-        elif percent >= 75:
-            self.cadrant = "270° horaire - 90° contre horaire"
-        elif percent >= 45:
-            self.cadrant = "180°"
-        elif percent >= 30:
-            self.cadrant = "270° horaire - 90° contre horaire"
-        else:
-            self.cadrant = "90° horaire"
-
         self.health_string = "{:,}".format(self.current_health).replace(",", " ")
 
     def update_shield(self, update):
