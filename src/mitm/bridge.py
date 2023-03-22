@@ -182,7 +182,6 @@ class InjectorBridgeHandler(BridgeHandler):
         from_client = origin == self.coJeu
 
         msg = Msg.fromRaw(self.buf[origin], from_client)
-        print("Handling msg")
         while msg is not None:
             msgType = protocol.msg_from_id[msg.id]
             parsedMsg = protocol.read(msgType, msg.data)
@@ -225,15 +224,16 @@ class InjectorBridgeHandler(BridgeHandler):
 
             time.sleep(0.005)
 
+    @abstractmethod
     def handle_message(self, m, o):
         pass
 
 
-class KarrelageBridgeHandler(MsgBridgeHandler):
+class KarrelageBridgeHandler(InjectorBridgeHandler):
     def __init__(self, coJeu, coSer, packet_read):
         super().__init__(coJeu, coSer)
-        self.db = deque([], maxlen=100)
         self.packet_read = packet_read
 
     def handle_message(self, msg, origin):
         self.packet_read(msg)
+

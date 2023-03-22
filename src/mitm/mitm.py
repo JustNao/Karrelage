@@ -41,7 +41,7 @@ def launch_mitm(packet_read, pid=None):
 
     hook(target, PORT, FILTER)
 
-    return httpd
+    return httpd, bridges
 
 
 if __name__ == "__main__":

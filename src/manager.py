@@ -1,6 +1,7 @@
 from src.sniffer.network import launch_in_thread
 from src.mitm.mitm import launch_mitm
 from src.modules.base import DofusModule
+from src.mitm.mitm import bridges
 import importlib
 
 
@@ -10,6 +11,7 @@ class Manager:
         self.current_module: DofusModule = None
         self.stop = None
         self.type = type
+        self.bridge = None
 
     def set_current_module(self, module, class_name):
         module_file = importlib.import_module(f"src.modules.{module}")
@@ -22,7 +24,8 @@ class Manager:
             self.stop = launch_in_thread(self.current_module.handle_packet)
             print("Sniffer launched")
         elif self.type == "attach":
-            self.stop = launch_mitm(self.current_module.handle_packet).shutdown
+            httpd, bridges = launch_mitm(self.current_module.handle_packet)
+            self.stop = httpd.shutdown
             print("Bridge launched")
 
     def stop(self):
@@ -39,3 +42,10 @@ class Manager:
             self.type = "sniffer"
 
         print(f"Type set to {self.type}")
+
+    def send_message(self, message):
+        if self.bridge is None and len(bridges) > 0:
+            self.bridge = bridges[0]
+
+        if self.bridge is not None:
+            self.bridge.send_message(message)
