@@ -3,3 +3,4 @@ __pycache__
 config/multicompte.json
 node_modules
 test.*
+env

@@ -9,3 +9,4 @@ psutil
 PyAutoGUI
 scapy==2.4.2
 waitress
+pywin32
