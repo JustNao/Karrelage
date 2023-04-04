@@ -4,3 +4,4 @@ config/multicompte.json
 node_modules
 test.*
 env
+protocol
