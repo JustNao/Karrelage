@@ -37,6 +37,7 @@ class HDVFilter(DofusModule):
         self.item = None
         self.bids = []
         self.releventBids = []
+        self.filter = {}
 
     def nextBid(self, _):
         if len(self.releventBids) > 0:
