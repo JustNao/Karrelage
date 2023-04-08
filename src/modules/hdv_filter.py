@@ -5,6 +5,7 @@ from src.entities.item import items
 from src.entities.utils import kamasToString
 from .base import DofusModule
 import keyboard
+import json
 
 
 class HDVFilter(DofusModule):
@@ -14,12 +15,7 @@ class HDVFilter(DofusModule):
         self.item = None
         self.bids = []
         self.releventBids = []
-        self.filter = {
-            "118": {
-                "value": 50,
-                "diff": 2,
-            },
-        }
+        self.filter = {}
         self.position = 0
         keyboard.on_press_key("right", self.nextBid)
         keyboard.on_press_key("left", self.previousBid)
@@ -125,7 +121,10 @@ class HDVFilter(DofusModule):
 
     def filterBids(self, filt):
         self.releventBids = []
-
+        self.filter = {}
+        for effect in filt:
+            if filt[effect] != "":
+                self.filter[int(effect)] = filt[effect]
         characFilter = {}
         for effect, value in filt.items():
             if value != "" and value != "0" and int(effect) not in characFilter:

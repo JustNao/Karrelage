@@ -78,6 +78,7 @@ def hdv_filter():
         return render_template(
             "hdv_filter.html",
             content=module.item["effects"],
+            filter_values=module.filter,
             name=module.item["name"],
             level=module.item["level"],
         )
