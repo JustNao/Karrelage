@@ -1,11 +1,11 @@
 import subprocess
 import os
 from build_protocol import main as build_protocol
-
+from pathlib import Path
 
 def update_packets():
     username = os.getlogin()
-    wd = os.getcwd().replace("\\", "/")
+    wd = str(Path(__file__).absolute().parents[1]).replace("\\", "/")
     DofusInvoker = (
         f"C:\\Users\\{username}\\AppData\\Local\\Ankama\\Dofus\\DofusInvoker.swf"
     )
