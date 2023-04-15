@@ -312,17 +312,17 @@ class TeamManager(DofusModule):
             return
 
         # If the player has a window registered, we bring it to the foreground
-        if player.window is not None:
-            try:
-                shell = win32com.client.Dispatch(
-                    "WScript.Shell", pythoncom.CoInitialize()
-                )
-                shell.SendKeys(
-                    "%"
-                )  # Send alt to shell, required for SetForegroundWindow
-                win32gui.SetForegroundWindow(player.window)
-            except:
-                pass
+        # if player.window is not None:
+        #     try:
+        #         shell = win32com.client.Dispatch(
+        #             "WScript.Shell", pythoncom.CoInitialize()
+        #         )
+        #         shell.SendKeys(
+        #             "%"
+        #         )  # Send alt to shell, required for SetForegroundWindow
+        #         win32gui.SetForegroundWindow(player.window)
+        #     except:
+        #         pass
 
     def handle_GameFightShowFighterMessage(self, packet):
         """Triggered when an entity is added to the combat.
