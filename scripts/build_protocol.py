@@ -30,8 +30,8 @@ optional_var_pattern_of_name = r"\s*if\(this\.%s == null\)\n"
 hash_function_pattern = r"\s*HASH_FUNCTION\(data\);\n"
 wrapped_boolean_pattern = r"\s*this.(?P<name>\w+) = BooleanByteWrapper\.getFlag\(.*;\n"
 
-
 def load_from_path(path):
+    global types, msg_from_id, types_from_id
     if isinstance(path, str):
         path = Path(path)
     for p in path.glob("**/*.as"):
@@ -46,6 +46,7 @@ def lines(t):
 
 
 def parseVar(name, typename, lines):
+    global types, msg_from_id, types_from_id
     if typename in ["Boolean", "ByteArray"]:
         return dict(name=name, length=None, type=typename, optional=False)
     if typename in types:
@@ -78,6 +79,7 @@ def parseVar(name, typename, lines):
 
 
 def parseVectorVar(name, typename, lines):
+    global types, msg_from_id, types_from_id
     if typename in types:
         type = typename
 
@@ -110,6 +112,7 @@ def parseVectorVar(name, typename, lines):
 
 
 def parse(t):
+    global types, msg_from_id, types_from_id
     vars = []
     hash_function = False
     wrapped_booleans = set()
@@ -165,14 +168,18 @@ def parse(t):
 
 
 def build():
+    global types, msg_from_id, types_from_id
     for t in tqdm(types.values()):
         parse(t)
 
 
 root_path = Path(__file__).absolute().parents[1]
 labot_path = root_path
+types = {}
+msg_from_id = {}
+types_from_id = {}
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         description="Protocol builder that creates protocol.pk from the decompiled sources"
     )
@@ -182,9 +189,7 @@ if __name__ == "__main__":
     # TODO: add filter for name
     args = parser.parse_args()
 
-    types = {}
-    msg_from_id = {}
-    types_from_id = {}
+
 
     paths = [
         args.sources_path / "scripts/com/ankamagames/dofus/network/types",
@@ -208,3 +213,6 @@ if __name__ == "__main__":
         pickle.dump(msg_from_id, f)
         pickle.dump(types_from_id, f)
         pickle.dump(primitives, f)
+
+if __name__ == "__main__":
+    main()
