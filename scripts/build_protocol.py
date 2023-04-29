@@ -30,6 +30,7 @@ optional_var_pattern_of_name = r"\s*if\(this\.%s == null\)\n"
 hash_function_pattern = r"\s*HASH_FUNCTION\(data\);\n"
 wrapped_boolean_pattern = r"\s*this.(?P<name>\w+) = BooleanByteWrapper\.getFlag\(.*;\n"
 
+
 def load_from_path(path):
     global types, msg_from_id, types_from_id
     if isinstance(path, str):
@@ -47,6 +48,7 @@ def lines(t):
 
 def parseVar(name, typename, lines):
     global types, msg_from_id, types_from_id
+    type = False
     if typename in ["Boolean", "ByteArray"]:
         return dict(name=name, length=None, type=typename, optional=False)
     if typename in types:
@@ -118,7 +120,6 @@ def parse(t):
     wrapped_booleans = set()
 
     for line in lines(t):
-
         m = re.fullmatch(class_pattern, line)
         if m:
             assert m.group("name") == t["name"]
@@ -179,17 +180,15 @@ types = {}
 msg_from_id = {}
 types_from_id = {}
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Protocol builder that creates protocol.pk from the decompiled sources"
     )
-    parser.add_argument("--sources-path", type=Path,
-                        default=root_path / "protocol")
+    parser.add_argument("--sources-path", type=Path, default=root_path / "protocol")
     parser.add_argument("--labot-path", type=Path, default=root_path / "src/sniffer")
     # TODO: add filter for name
     args = parser.parse_args()
-
-
 
     paths = [
         args.sources_path / "scripts/com/ankamagames/dofus/network/types",
@@ -213,6 +212,9 @@ def main():
         pickle.dump(msg_from_id, f)
         pickle.dump(types_from_id, f)
         pickle.dump(primitives, f)
+
+    return args.labot_path / "protocol.pk"
+
 
 if __name__ == "__main__":
     main()
