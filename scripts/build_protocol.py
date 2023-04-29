@@ -48,7 +48,6 @@ def lines(t):
 
 def parseVar(name, typename, lines):
     global types, msg_from_id, types_from_id
-    type = False
     if typename in ["Boolean", "ByteArray"]:
         return dict(name=name, length=None, type=typename, optional=False)
     if typename in types:
