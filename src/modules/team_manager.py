@@ -372,6 +372,9 @@ class TeamManager(DofusModule):
         """Triggered when the team is updated."""
 
         own_team = False
+        if "teamMembers" not in packet["team"]:
+            return
+
         for member in packet["team"]["teamMembers"]:
             # If it's a monster group, abort
             if "name" not in member:
