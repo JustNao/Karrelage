@@ -2,6 +2,7 @@ from src.sniffer.network import launch_in_thread
 from src.mitm.mitm import launch_mitm
 from src.modules.base import DofusModule
 from src.mitm.mitm import bridges
+from src.sniffer.check import check_for_update
 import importlib
 
 
@@ -12,6 +13,7 @@ class Manager:
         self.stop = None
         self.type = type
         self.bridge = None
+        check_for_update()
 
     def set_current_module(self, module, class_name):
         module_file = importlib.import_module(f"src.modules.{module}")

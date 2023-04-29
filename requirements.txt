@@ -11,3 +11,5 @@ scapy==2.4.2
 waitress
 pywin32
 tqdm
+requests
+python-dotenv

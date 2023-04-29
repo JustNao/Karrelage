@@ -1,9 +1,13 @@
 import subprocess
 import os
+import requests as rq
 from build_protocol import main as build_protocol
 from pathlib import Path
+from dotenv import load_dotenv
+
 
 def update_packets():
+    load_dotenv()
     username = os.getlogin()
     wd = str(Path(__file__).absolute().parents[1]).replace("\\", "/")
     DofusInvoker = (
@@ -19,7 +23,26 @@ def update_packets():
         if "OK" in line:
             print("DofusInvoker.swf loaded, building protocol..")
             break
-    build_protocol()
+    protocol_path = build_protocol()
+    with open(f"C:/Users/{username}/AppData/Local/Ankama/Dofus/VERSION", "r") as f:
+        current_official_version = f.read().strip()
+    with open("DOFUS_VERSION", "w") as f:
+            f.write(current_official_version)
+
+    if os.environ.get("LOCAL_DOFUS_VERSION_ADDRESS") is not None:
+        print("Updating protocol on server..")
+        with open(protocol_path, "rb") as f:
+            rq.post(
+                os.environ.get("LOCAL_DOFUS_VERSION_ADDRESS") + "/protocol",
+                files={"protocol.pk": f},
+            )
+        response = rq.post(
+            os.environ.get("LOCAL_DOFUS_VERSION_ADDRESS") + "/version",
+            json={"version": current_official_version},
+        )
+        if not response.ok:
+            print("Error while updating version on server.")
+            print(response.content.decode("utf-8"))
 
 
 if __name__ == "__main__":
