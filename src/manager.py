@@ -13,7 +13,8 @@ class Manager:
         self.stop = None
         self.type = type
         self.bridge = None
-        check_for_update()
+
+        check_for_update()  # Comment this line to disable auto-update
 
     def set_current_module(self, module, class_name):
         module_file = importlib.import_module(f"src.modules.{module}")
