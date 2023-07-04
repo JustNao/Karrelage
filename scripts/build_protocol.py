@@ -75,7 +75,6 @@ def parseVar(name, typename, lines):
         m = re.fullmatch(optional_var_pattern, line)
         if m:
             optional = True
-
     return dict(name=name, length=None, type=type, optional=optional)
 
 
@@ -121,7 +120,9 @@ def parse(t):
     for line in lines(t):
         m = re.fullmatch(class_pattern, line)
         if m:
-            assert m.group("name") == t["name"]
+            assert (
+                m.group("name").lower() == t["name"].lower()
+            ), f"{m.group('name')}, {t['name']}"
             parent = m.group("parent")
             if not parent in types:
                 parent = None
@@ -133,8 +134,11 @@ def parse(t):
 
         m = re.fullmatch(public_var_pattern, line)
         if m:
-            var = parseVar(m.group("name"), m.group("type"), lines(t))
-            vars.append(var)
+            try:
+                var = parseVar(m.group("name"), m.group("type"), lines(t))
+                vars.append(var)
+            except UnboundLocalError as e:
+                pass
 
         m = re.fullmatch(hash_function_pattern, line)
         if m:
