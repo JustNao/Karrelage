@@ -18,6 +18,7 @@ manager = Manager(
         # Display string, module name, class name
         ("HDV Filter", "hdv_filter", "HDVFilter"),
         ("Team Manager", "team_manager", "TeamManager"),
+        ("Biscuit", "biscuit", "Biscuit"),
     ],
 )
 module = None
@@ -35,6 +36,11 @@ def team_manager():
     return render_template(
         "team_manager.html", team=module.get_team(), hash=module.__hash__()
     )
+
+
+@app.route("/biscuit")
+def biscuit():
+    return render_template("biscuit.html", content=[],)
 
 
 @app.route("/load", methods=["GET", "POST"])
