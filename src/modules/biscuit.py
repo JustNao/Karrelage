@@ -1,29 +1,32 @@
 import requests as rq
 import keyboard as kb
+import win32gui as w32
 import pyperclip
 from .base import DofusModule
 from time import sleep
-import win32gui as w32
+from datetime import datetime, timezone
+from dateutil import parser, relativedelta
 
 
 class Commander:
     def __init__(self):
         self.commands = {
-            "enutrosor": lambda _: self.portals("enutrosor"),
-            "srambad": lambda _: self.portals("srambad"),
-            "xelorium": lambda _: self.portals("xelorium"),
-            "ecaflipus": lambda _: self.portals("ecaflipus"),
+            "enutrosor": lambda _, channel: self.portals("enutrosor", channel),
+            "srambad": lambda _, channel: self.portals("srambad", channel),
+            "xelorium": lambda _, channel: self.portals("xelorium", channel),
+            "ecaflipus": lambda _, channel: self.portals("ecaflipus", channel),
+        }
+        self.channels = {
+            2: "/g",
+            4: "/p",
         }
 
     def send_message(self, message):
-        kb.press("space")
-        sleep(2)
         pyperclip.copy(message)
-        kb.press("ctrl+v")
-        sleep(0.2)
-        kb.press("enter")
+        kb.press_and_release("ctrl+v")
+        kb.press_and_release("enter")
 
-    def portals(self, zone):
+    def portals(self, zone, channel):
         zone_id = {
             "ecaflipus": 0,
             "enutrosor": 1,
@@ -41,11 +44,25 @@ class Commander:
                 relevent_portal["position"]["x"],
                 relevent_portal["position"]["y"],
             )
-            print(pos_x, pos_y)
-            self.send_message(f"Portail {zone} en [{pos_x},{pos_y}]")
+            try:
+                time_str = relevent_portal["createdAt"]
+            except KeyError:
+                time_str = relevent_portal["updatedAt"]
+            given_time = parser.isoparse(time_str)
+            current_time = datetime.now(timezone.utc)
+            time_diff = relativedelta.relativedelta(current_time, given_time)
+            time_diff_str = (
+                f"{time_diff.minutes} minutes"
+                if time_diff.hours == 0
+                else f"{time_diff.hours} heures et {time_diff.minutes} minutes"
+            )
+            remaining_uses = relevent_portal["remainingUses"]
+            self.send_message(
+                f"{self.channels[channel]} Portail {zone} en [{pos_x},{pos_y}] il y'a {time_diff_str} ({remaining_uses} utilisations restantes)"
+            )
         except KeyError:
             print("Pas de portail")
-            self.send_message(f"Pas de portal {zone} trouvé")
+            self.send_message(f"{self.channels[channel]} Pas de portal {zone} trouvé")
 
 
 class Biscuit(DofusModule):
@@ -79,4 +96,4 @@ class Biscuit(DofusModule):
 
             command_key = message.split(" ")[0][1:]
             if command_key in self.commander.commands:
-                self.commander.commands[command_key](message)
+                self.commander.commands[command_key](message, packet["channel"])

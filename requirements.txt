@@ -13,3 +13,5 @@ pywin32
 tqdm
 requests
 python-dotenv
+pyperclip
+python-dateutil
