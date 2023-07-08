@@ -1,7 +1,8 @@
+import pyperclip
+import json
 import requests as rq
 import keyboard as kb
 import win32gui as w32
-import pyperclip
 from .base import DofusModule
 from time import sleep
 from datetime import datetime, timezone
@@ -70,10 +71,19 @@ class Biscuit(DofusModule):
 
     def __init__(self) -> None:
         self.reset()
+        self.load_config()
 
     def reset(self):
         self.commander = Commander()
         self.config = {"commands": True}
+
+    def load_config(self):
+        with open("config/biscuit.json") as f:
+            self.config = self.config | json.load(f)
+
+    def save_config(self):
+        with open("config/biscuit.json", "w") as f:
+            json.dump(self.config, f, indent=4)
 
     def update(self, data: str):
         key, value = data.split(":")
@@ -83,6 +93,8 @@ class Biscuit(DofusModule):
             self.config[key] = not self.config[key]
         else:
             self.config[key] = value
+
+        self.save_config()
 
     def handle_ChatServerMessage(self, packet):
         """Triggered when a message is received in the chat (including the player's)"""

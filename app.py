@@ -42,7 +42,7 @@ def team_manager():
 def biscuit():
     return render_template(
         "biscuit.html",
-        content=[],
+        config=module.config,
     )
 
 
@@ -136,9 +136,7 @@ def session_update():
 @app.route("/update", methods=["GET", "POST"])
 def update():
     if request.method == "POST":
-        print(request.form)
         data = request.form["data"]
-        print(data)
         module.update(data)
     return "ok"
 
