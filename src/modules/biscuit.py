@@ -4,6 +4,9 @@ import requests as rq
 import keyboard as kb
 import win32gui as w32
 from .base import DofusModule
+from src.entities.utils import load
+from src.entities.id import monsterToName
+from src.entities.media import play_sound
 from time import sleep
 from datetime import datetime, timezone
 from dateutil import parser, relativedelta
@@ -72,10 +75,12 @@ class Biscuit(DofusModule):
     def __init__(self) -> None:
         self.reset()
         self.load_config()
+        self.archimonstres = load("Archi")
+        self.relevant_monster = None
 
     def reset(self):
         self.commander = Commander()
-        self.config = {"commands": True}
+        self.config = {"commands": True, "archimonstres": True}
 
     def load_config(self):
         with open("config/biscuit.json") as f:
@@ -99,8 +104,8 @@ class Biscuit(DofusModule):
     def handle_ChatServerMessage(self, packet):
         """Triggered when a message is received in the chat (including the player's)"""
 
+        # Only handle guild (2) and group (4) chat
         if packet["channel"] not in [2, 4]:
-            # Only handle guild (2) and group (4) chat
             return
 
         message = packet["content"]
@@ -119,3 +124,25 @@ class Biscuit(DofusModule):
             command_key = message.split(" ")[0][1:]
             if command_key in self.commander.commands:
                 self.commander.commands[command_key](message, packet["channel"])
+
+    def handle_MapComplementaryInformationsDataMessage(self, packet):
+        """Triggered when the player changes map"""
+
+        actors = packet["actors"]
+        for entity in actors:
+            # Monster group
+            if entity["__type__"] == "GameRolePlayGroupMonsterInformations":
+                monsters = []
+                print(entity["staticInfos"]["mainCreatureLightInfos"])
+                monsters.append(
+                    entity["staticInfos"]["mainCreatureLightInfos"]
+                )  # Main monster
+                monsters += entity["staticInfos"]["underlings"]  # Underlings
+                for monster in monsters:
+                    monster_name = monsterToName(monster["genericId"])
+                    if (
+                        monster_name in self.archimonstres
+                        or monster_name == self.relevant_monster
+                    ):
+                        play_sound("spotted")
+                        return

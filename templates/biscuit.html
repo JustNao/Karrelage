@@ -12,7 +12,7 @@
   // );
 </script>
 {% endblock %} {% block content %}
-<div>
+<div class="flex flex-col space-y-4">
   <label class="relative inline-flex items-center cursor-pointer">
     {% if config['commands'] %}
     <input
@@ -34,6 +34,28 @@
       class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-700"
     ></div>
     <span class="ml-3 text-sm text-gray-300">Commandes</span>
+  </label>
+  <label class="relative inline-flex items-center cursor-pointer">
+    {% if config['archimonstres'] %}
+    <input
+      type="checkbox"
+      value=""
+      class="sr-only peer"
+      checked
+      onclick="update_config('archimonstres')"
+    />
+    {% else %}
+    <input
+      type="checkbox"
+      value=""
+      class="sr-only peer"
+      onclick="update_config('archimonstres')"
+    />
+    {% endif %}
+    <div
+      class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-700"
+    ></div>
+    <span class="ml-3 text-sm text-gray-300">Archimonstres</span>
   </label>
 </div>
 {% endblock %}
