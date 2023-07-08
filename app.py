@@ -40,7 +40,18 @@ def team_manager():
 
 @app.route("/biscuit")
 def biscuit():
-    return render_template("biscuit.html", content=[],)
+    return render_template(
+        "biscuit.html",
+        content=[],
+    )
+
+
+@app.route("/biscuit_config", methods=["GET", "POST"])
+def biscuit_config():
+    if request.method == "POST":
+        data = request.form
+        print(data)
+    return {"status": "ok"}
 
 
 @app.route("/load", methods=["GET", "POST"])
@@ -125,6 +136,7 @@ def session_update():
 @app.route("/update", methods=["GET", "POST"])
 def update():
     if request.method == "POST":
+        print(request.form)
         data = request.form["data"]
         print(data)
         module.update(data)

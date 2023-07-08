@@ -22,3 +22,6 @@ class DofusModule:
                 return
 
             handler(packet)
+
+    def update(self, data):
+        pass

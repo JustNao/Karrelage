@@ -73,6 +73,16 @@ class Biscuit(DofusModule):
 
     def reset(self):
         self.commander = Commander()
+        self.config = {"commands": True}
+
+    def update(self, data: str):
+        key, value = data.split(":")
+
+        # If the value is empty, its a toggle
+        if value == "null":
+            self.config[key] = not self.config[key]
+        else:
+            self.config[key] = value
 
     def handle_ChatServerMessage(self, packet):
         """Triggered when a message is received in the chat (including the player's)"""
@@ -82,7 +92,7 @@ class Biscuit(DofusModule):
             return
 
         message = packet["content"]
-        if message.startswith("$"):
+        if message.startswith("$") and self.config["commands"]:
             # If user is not in Dofus, don't handle the message
             window_title = w32.GetWindowText(w32.GetForegroundWindow())
             if "Dofus" not in window_title:
