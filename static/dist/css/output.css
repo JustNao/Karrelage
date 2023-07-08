@@ -1131,8 +1131,8 @@ input:checked + .toggle-bg {
   margin-top: -0.25rem;
 }
 
-.-mt-20 {
-  margin-top: -5rem;
+.-mt-32 {
+  margin-top: -8rem;
 }
 
 .mb-1 {
@@ -1187,16 +1187,20 @@ input:checked + .toggle-bg {
   margin-top: 1rem;
 }
 
-.mt-10 {
-  margin-top: 2.5rem;
-}
-
 .mt-6 {
   margin-top: 1.5rem;
 }
 
-.-mt-32 {
-  margin-top: -8rem;
+.mt-32 {
+  margin-top: 8rem;
+}
+
+.mt-16 {
+  margin-top: 4rem;
+}
+
+.mt-8 {
+  margin-top: 2rem;
 }
 
 .block {
@@ -1229,10 +1233,6 @@ input:checked + .toggle-bg {
 
 .hidden {
   display: none;
-}
-
-.h-10 {
-  height: 2.5rem;
 }
 
 .h-16 {
@@ -1268,8 +1268,12 @@ input:checked + .toggle-bg {
   height: 100%;
 }
 
-.h-1 {
-  height: 0.25rem;
+.h-64 {
+  height: 16rem;
+}
+
+.h-32 {
+  height: 8rem;
 }
 
 .w-1\/2 {
@@ -1414,6 +1418,10 @@ input:checked + .toggle-bg {
   resize: both;
 }
 
+.auto-rows-max {
+  grid-auto-rows: max-content;
+}
+
 .grid-cols-4 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -1422,12 +1430,24 @@ input:checked + .toggle-bg {
   grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-rows-2 {
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
 .flex-row {
   flex-direction: row;
 }
 
 .flex-col {
   flex-direction: column;
+}
+
+.content-start {
+  align-content: flex-start;
 }
 
 .items-start {
@@ -1456,6 +1476,18 @@ input:checked + .toggle-bg {
 
 .justify-between {
   justify-content: space-between;
+}
+
+.gap-1 {
+  gap: 0.25rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-y-0 {
+  row-gap: 0px;
 }
 
 .space-x-2 > :not([hidden]) ~ :not([hidden]) {
@@ -1678,28 +1710,12 @@ input:checked + .toggle-bg {
   fill: #1C64F2;
 }
 
-.fill-white {
-  fill: #ffffff;
-}
-
-.fill-black {
-  fill: #000000;
-}
-
-.fill-zinc-600 {
-  fill: #52525b;
-}
-
-.fill-red-500 {
-  fill: #F05252;
-}
-
-.fill-neutral-200 {
-  fill: #e5e5e5;
-}
-
 .fill-neutral-100 {
   fill: #f5f5f5;
+}
+
+.fill-white {
+  fill: #ffffff;
 }
 
 .p-0 {
@@ -1796,6 +1812,10 @@ input:checked + .toggle-bg {
 
 .text-right {
   text-align: right;
+}
+
+.align-top {
+  vertical-align: top;
 }
 
 .align-middle {
@@ -2091,11 +2111,6 @@ input:checked + .toggle-bg {
 .hover\:bg-gray-800:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(31 41 55 / var(--tw-bg-opacity));
-}
-
-.hover\:bg-gray-900:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(17 24 39 / var(--tw-bg-opacity));
 }
 
 .hover\:bg-green-700:hover {
