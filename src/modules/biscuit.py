@@ -77,6 +77,7 @@ class Biscuit(DofusModule):
     def __init__(self) -> None:
         self.reset()
         self.load_config()
+        self.load_data()
         self.archimonstres = load("Archi")
 
     def reset(self):
@@ -85,12 +86,17 @@ class Biscuit(DofusModule):
             "commands": True,
             "archimonstres": True,
             "houses": True,
-            "house_price": "5",
         }
 
     def load_config(self):
         with open("config/biscuit.json") as f:
             self.config = self.config | json.load(f)
+
+    def load_data(self):
+        if os.path.exists("config/abandonned_houses.txt"):
+            with open("config/abandonned_houses.txt", "r") as f:
+                positions = f.readlines()
+                self.houses = [pos.strip() for pos in positions]
 
     def save_config(self):
         with open("config/biscuit.json", "w") as f:
@@ -109,16 +115,17 @@ class Biscuit(DofusModule):
 
     def save_abandonned_house(self, map_id):
         x, y = mapToPositions(map_id)
-        mode = "a" if os.path.exists("config/abandonned_houses.txt") else "w"
-        if mode == "a":
-            with open("config/abandonned_houses.txt", "r") as f:
-                positions = f.readlines()
-                if f"[{x},{y}]\n" in positions:
-                    print("position already saved")
-                    return
+        position_string = f"[{x},{y}]"
+        mode = "a" if len(self.houses) > 0 else "w"
+
+        if position_string in self.houses:
+            print("position already saved")
+            return
+
         with open("config/abandonned_houses.txt", mode) as f:
-            f.write(f"[{x},{y}]\n")
-            print(f"saved position [{x},{y}]")
+            f.write(f"{position_string}\n")
+            print(f"saved position {position_string}")
+            self.houses.append(position_string)
 
     def handle_ChatServerMessage(self, packet):
         """Triggered when a message is received in the chat (including the player's)"""
@@ -165,8 +172,8 @@ class Biscuit(DofusModule):
 
         if self.config["houses"]:
             for house in packet["houses"]:
-                # if len(house["houseInstances"]) > 1:
-                #     break
+                if len(house["houseInstances"]) > 1:
+                    break
 
                 for house_instance in house["houseInstances"]:
                     is_abandonned = not house_instance["hasOwner"]

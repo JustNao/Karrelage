@@ -43,6 +43,7 @@ def biscuit():
     return render_template(
         "biscuit.html",
         config=module.config,
+        houses=module.houses,
     )
 
 
