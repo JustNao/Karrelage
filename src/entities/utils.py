@@ -8,6 +8,7 @@ def load(file):
     ) as f:
         return json.load(f)
 
+
 def save(data, file):
     with gzip.open(
         f"src/entities/gameRessources/{file}.gz", "wt", encoding="utf-8"
@@ -16,4 +17,5 @@ def save(data, file):
 
 
 def kamasToString(price: int):
+    print(price)
     return f"{price:,}"

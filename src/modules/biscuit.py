@@ -1,17 +1,15 @@
 import pyperclip
 import json
 import os
-import re
 import requests as rq
 import keyboard as kb
 import win32gui as w32
 from .base import DofusModule
-from src.entities.utils import load
+from src.entities.utils import load, kamasToString
 from src.entities.id import monsterToName
 from src.entities.media import play_sound
 from src.entities.maps import mapToPositions
 from src.utils.externals import Vulbis
-from time import sleep
 from datetime import datetime, timezone
 from dateutil import parser, relativedelta
 
@@ -23,6 +21,7 @@ class Commander:
             "srambad": lambda _, channel: self.portals("srambad", channel),
             "xelorium": lambda _, channel: self.portals("xelorium", channel),
             "ecaflipus": lambda _, channel: self.portals("ecaflipus", channel),
+            "price": lambda packet, channel: self.price(packet, channel),
         }
         self.channels = {
             2: "/g",
@@ -73,6 +72,13 @@ class Commander:
             self.send_message(
                 f"{self.channels[channel]} Portail {zone} dernièrement vu en [{pos_x},{pos_y}] il y'a {time}"
             )
+
+    def price(self, packet, channel: int):
+        gid = packet["objects"][0]["objectGID"]
+        price = Vulbis.get_craft_price(gid)
+        self.send_message(
+            f"{self.channels[channel]} Prix de craft: {kamasToString(price)} K"
+        )
 
 
 class Biscuit(DofusModule):
@@ -154,7 +160,15 @@ class Biscuit(DofusModule):
 
             command_key = message.split(" ")[0][1:]
             if command_key in self.commander.commands:
-                self.commander.commands[command_key](message, packet["channel"])
+                try:
+                    self.commander.commands[command_key](packet, packet["channel"])
+                except Exception as e:
+                    print(f"Error while executing command {command_key}: {e}")
+
+    def handle_ChatServerWithObjectMessage(self, packet):
+        """Triggered when a message with objects is received in the chat (including the player's)"""
+
+        self.handle_ChatServerMessage(packet)
 
     def handle_MapComplementaryInformationsDataMessage(self, packet):
         """Triggered when the player changes map"""

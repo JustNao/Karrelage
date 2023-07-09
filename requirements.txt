@@ -16,3 +16,4 @@ python-dotenv
 pyperclip
 python-dateutil
 playsound
+undetected_chromedriver

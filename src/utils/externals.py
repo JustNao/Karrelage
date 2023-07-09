@@ -1,5 +1,6 @@
 import re
 import requests as rq
+import undetected_chromedriver as uc
 
 
 class Vulbis:
@@ -43,3 +44,17 @@ class Vulbis:
         return *Vulbis.extract_position(
             response.text
         ), Vulbis.extract_preceding_content(response.text)
+
+    @staticmethod
+    def get_craft_price(gid: int):
+        driver = uc.Chrome(headless=True)
+        driver.get(
+            f"https://www.vulbis.com/?server=Draconiros&gids={gid}&percent=0&craftableonly=false&select-type=-1&sellchoice=false&buyqty=1&sellqty=1&percentsell=0",
+        )
+        driver.implicitly_wait(10)
+        craft_price_raw = driver.find_element(
+            uc.By.XPATH, '//*[@id="scanTable"]/tbody/tr/td[10]/p[1]'
+        ).text
+        craft_price = craft_price_raw.replace("\u2006", "")
+        driver.quit()
+        return int(craft_price)
