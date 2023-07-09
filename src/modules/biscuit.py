@@ -1,6 +1,7 @@
 import pyperclip
 import json
 import os
+import re
 import requests as rq
 import keyboard as kb
 import win32gui as w32
@@ -9,6 +10,7 @@ from src.entities.utils import load
 from src.entities.id import monsterToName
 from src.entities.media import play_sound
 from src.entities.maps import mapToPositions
+from src.utils.externals import Vulbis
 from time import sleep
 from datetime import datetime, timezone
 from dateutil import parser, relativedelta
@@ -32,7 +34,7 @@ class Commander:
         kb.press_and_release("ctrl+v")
         kb.press_and_release("enter")
 
-    def portals(self, zone, channel):
+    def portals(self, zone: str, channel: int):
         zone_id = {
             "ecaflipus": 0,
             "enutrosor": 1,
@@ -64,11 +66,13 @@ class Commander:
             )
             remaining_uses = relevent_portal["remainingUses"]
             self.send_message(
-                f"{self.channels[channel]} Portail {zone} en [{pos_x},{pos_y}] il y'a {time_diff_str} ({remaining_uses} utilisations restantes)"
+                f"{self.channels[channel]} Portail {zone} dernièrement vu en [{pos_x},{pos_y}] il y'a {time_diff_str} (avec {remaining_uses} utilisations)"
             )
         except KeyError:
-            print("Pas de portail")
-            self.send_message(f"{self.channels[channel]} Pas de portal {zone} trouvé")
+            pos_x, pos_y, time = Vulbis.get_portal_positions(zone)
+            self.send_message(
+                f"{self.channels[channel]} Portail {zone} dernièrement vu en [{pos_x},{pos_y}] il y'a {time}"
+            )
 
 
 class Biscuit(DofusModule):
