@@ -76,11 +76,15 @@ class Biscuit(DofusModule):
         self.reset()
         self.load_config()
         self.archimonstres = load("Archi")
-        self.relevant_monster = None
 
     def reset(self):
         self.commander = Commander()
-        self.config = {"commands": True, "archimonstres": True}
+        self.config = {
+            "commands": True,
+            "archimonstres": True,
+            "houses": True,
+            "house_price": "5",
+        }
 
     def load_config(self):
         with open("config/biscuit.json") as f:
@@ -128,21 +132,29 @@ class Biscuit(DofusModule):
     def handle_MapComplementaryInformationsDataMessage(self, packet):
         """Triggered when the player changes map"""
 
-        actors = packet["actors"]
-        for entity in actors:
-            # Monster group
-            if entity["__type__"] == "GameRolePlayGroupMonsterInformations":
-                monsters = []
-                print(entity["staticInfos"]["mainCreatureLightInfos"])
-                monsters.append(
-                    entity["staticInfos"]["mainCreatureLightInfos"]
-                )  # Main monster
-                monsters += entity["staticInfos"]["underlings"]  # Underlings
-                for monster in monsters:
-                    monster_name = monsterToName(monster["genericId"])
+        if self.config["archimonstres"]:
+            actors = packet["actors"]
+            for entity in actors:
+                # Monster group
+                if entity["__type__"] == "GameRolePlayGroupMonsterInformations":
+                    monsters = []
+                    monsters.append(
+                        entity["staticInfos"]["mainCreatureLightInfos"]
+                    )  # Main monster
+                    monsters += entity["staticInfos"]["underlings"]  # Underlings
+                    for monster in monsters:
+                        monster_name = monsterToName(monster["genericId"])
+                        if monster_name in self.archimonstres:
+                            play_sound("spotted")
+                            return
+
+        if self.config["houses"]:
+            for house in packet["houses"]:
+                for house_instance in house["houseInstances"]:
+                    house_price = house_instance["price"]
                     if (
-                        monster_name in self.archimonstres
-                        or monster_name == self.relevant_monster
+                        house_price > 0
+                        and house_price < float(self.config["house_price"]) * 1000000
                     ):
-                        play_sound("spotted")
+                        play_sound("dingding")
                         return
