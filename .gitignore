@@ -1,6 +1,7 @@
 __pycache__
 .vscode
 config/multicompte.json
+config/abandonned_houses.txt
 node_modules
 test.*
 env

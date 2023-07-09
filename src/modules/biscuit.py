@@ -1,5 +1,6 @@
 import pyperclip
 import json
+import os
 import requests as rq
 import keyboard as kb
 import win32gui as w32
@@ -7,6 +8,7 @@ from .base import DofusModule
 from src.entities.utils import load
 from src.entities.id import monsterToName
 from src.entities.media import play_sound
+from src.entities.maps import mapToPositions
 from time import sleep
 from datetime import datetime, timezone
 from dateutil import parser, relativedelta
@@ -105,6 +107,19 @@ class Biscuit(DofusModule):
 
         self.save_config()
 
+    def save_abandonned_house(self, map_id):
+        x, y = mapToPositions(map_id)
+        mode = "a" if os.path.exists("config/abandonned_houses.txt") else "w"
+        if mode == "a":
+            with open("config/abandonned_houses.txt", "r") as f:
+                positions = f.readlines()
+                if f"[{x},{y}]\n" in positions:
+                    print("position already saved")
+                    return
+        with open("config/abandonned_houses.txt", mode) as f:
+            f.write(f"[{x},{y}]\n")
+            print(f"saved position [{x},{y}]")
+
     def handle_ChatServerMessage(self, packet):
         """Triggered when a message is received in the chat (including the player's)"""
 
@@ -150,11 +165,13 @@ class Biscuit(DofusModule):
 
         if self.config["houses"]:
             for house in packet["houses"]:
+                # if len(house["houseInstances"]) > 1:
+                #     break
+
                 for house_instance in house["houseInstances"]:
-                    house_price = house_instance["price"]
-                    if (
-                        house_price > 0
-                        and house_price < float(self.config["house_price"]) * 1000000
-                    ):
+                    is_abandonned = not house_instance["hasOwner"]
+                    if is_abandonned:
+                        print("Abandonned house found ...", end=" ")
                         play_sound("dingding")
+                        self.save_abandonned_house(packet["mapId"])
                         return

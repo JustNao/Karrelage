@@ -1,6 +1,5 @@
 {
     "commands": true,
     "archimonstres": true,
-    "houses": true,
-    "house_price": "15"
+    "houses": true
 }
