@@ -135,4 +135,8 @@ def write(type, json, data=None, random_hash=True) -> Data:
 
 
 def readMsg(msg):
-    return read(msg_from_id[msg.id]["name"], msg.data)
+    try:
+        return read(msg_from_id[msg.id]["name"], msg.data)
+    except AssertionError:
+        logger.error("Assertion error while reading packet %s", msg.id)
+        return None
