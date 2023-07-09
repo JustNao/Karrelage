@@ -87,6 +87,7 @@ class Biscuit(DofusModule):
             "archimonstres": True,
             "houses": True,
         }
+        self.houses = []
 
     def load_config(self):
         with open("config/biscuit.json") as f:
