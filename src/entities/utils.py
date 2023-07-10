@@ -17,5 +17,4 @@ def save(data, file):
 
 
 def kamasToString(price: int):
-    print(price)
     return f"{price:,}"

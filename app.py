@@ -47,14 +47,6 @@ def biscuit():
     )
 
 
-@app.route("/biscuit_config", methods=["GET", "POST"])
-def biscuit_config():
-    if request.method == "POST":
-        data = request.form
-        print(data)
-    return {"status": "ok"}
-
-
 @app.route("/load", methods=["GET", "POST"])
 def load():
     global module, manager
