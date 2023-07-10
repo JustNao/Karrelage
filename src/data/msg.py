@@ -1,10 +1,12 @@
 import logging
+import zlib
 
 from .binrw import Data, Buffer
 from ..sniffer import protocol
 from colorama import Fore
 
 logger = logging.getLogger("labot")
+
 
 class Msg:
     def __init__(self, m_id, data, count=None):
@@ -66,7 +68,7 @@ class Msg:
                 buf.pos = len(buf)
             else:
                 buf.pos = 0
-            logger.debug('Multi packet message with id', id)
+            logger.debug("Multi packet message with id", id)
             return None
         else:
             if id == 2:
@@ -75,11 +77,13 @@ class Msg:
                     newbuffer = Buffer(data.readByteArray())
                 except IndexError:
                     return None
-                newbuffer.uncompress()
+                try:
+                    newbuffer.uncompress()
+                except zlib.error:
+                    return None
                 msg = Msg.fromRaw(newbuffer, from_client)
                 assert msg is not None and not newbuffer.remaining()
                 return msg
-            # logger.debug("Parsed %s", protocol.msg_from_id[id]["name"])
             buf.end()
 
             return Msg(id, data, count)
