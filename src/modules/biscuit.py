@@ -76,6 +76,9 @@ class Commander:
     def price(self, packet, channel: int):
         gid = packet["objects"][0]["objectGID"]
         price = Vulbis.get_craft_price(gid)
+        if price is None:
+            self.send_message(f"{self.channels[channel]} Prix de craft: inconnu")
+            return
         self.send_message(
             f"{self.channels[channel]} Prix de craft: {kamasToString(price)} K"
         )

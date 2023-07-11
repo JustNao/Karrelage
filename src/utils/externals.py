@@ -52,9 +52,13 @@ class Vulbis:
             f"https://www.vulbis.com/?server=Draconiros&gids={gid}&percent=0&craftableonly=false&select-type=-1&sellchoice=false&buyqty=1&sellqty=1&percentsell=0",
         )
         driver.implicitly_wait(10)
-        craft_price_raw = driver.find_element(
-            uc.By.XPATH, '//*[@id="scanTable"]/tbody/tr/td[10]/p[1]'
-        ).text
+        try:
+            craft_price_raw = driver.find_element(
+                uc.By.XPATH, '//*[@id="scanTable"]/tbody/tr/td[10]/p[1]'
+            ).text
+        except uc.common.exceptions.NoSuchElementException:
+            driver.quit()
+            return None
         craft_price = craft_price_raw.replace("\u2006", "")
         driver.quit()
         return int(craft_price)
