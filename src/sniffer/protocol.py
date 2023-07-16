@@ -140,3 +140,6 @@ def readMsg(msg):
     except AssertionError:
         logger.error("Assertion error while reading packet %s", msg.id)
         return None
+    except IndexError or KeyError:
+        print("Unknown packet id:", msg.id)
+        return None

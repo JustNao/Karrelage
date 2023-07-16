@@ -6,7 +6,7 @@ class DofusModule:
         packet = None
         try:
             name = protocol.msg_from_id[msg.id]["name"]
-        except IndexError:
+        except IndexError or KeyError:
             print("Unknown packet id:", msg.id)
             return
         except AttributeError:
