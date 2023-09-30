@@ -29,21 +29,6 @@ def update_packets():
     with open("DOFUS_VERSION", "w") as f:
             f.write(current_official_version)
 
-    if os.environ.get("LOCAL_DOFUS_VERSION_ADDRESS") is not None:
-        print("Updating protocol on server..")
-        with open(protocol_path, "rb") as f:
-            rq.post(
-                os.environ.get("LOCAL_DOFUS_VERSION_ADDRESS") + "/protocol",
-                files={"protocol.pk": f},
-            )
-        response = rq.post(
-            os.environ.get("LOCAL_DOFUS_VERSION_ADDRESS") + "/version",
-            json={"version": current_official_version},
-        )
-        if not response.ok:
-            print("Error while updating version on server.")
-            print(response.content.decode("utf-8"))
-
 
 if __name__ == "__main__":
     update_packets()
