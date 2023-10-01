@@ -377,16 +377,25 @@ class TeamManager(DofusModule):
 
         for member in packet["team"]["teamMembers"]:
             # If it's a monster group, abort
-            if "name" not in member:
+            if "name" not in member and "masterId" not in member:
                 return
 
             # If our own character is in the team, we continue
-            if any(member["name"] == x for x in self.player_characters):
+            if "name" in member and any(
+                member["name"] == x for x in self.player_characters
+            ):
                 own_team = True
                 break
 
         if not own_team:
             return
+
+        # Moving invocations to the end of the list
+        # so that we can register the master first
+        for index, member in enumerate(packet["team"]["teamMembers"]):
+            if "name" not in member:
+                invocation = packet["team"]["teamMembers"].pop(index)
+                packet["team"]["teamMembers"].append(invocation)
 
         for member in packet["team"]["teamMembers"]:
             # If not a player or already in team
@@ -396,6 +405,11 @@ class TeamManager(DofusModule):
             # If the member is a companion (e.g. Lumino)
             # We count it as an invocation
             if "masterId" in member:
+                # Need to check if the masteId is already registered, because sometimes
+                # we get the invocation before the master (and then again after the master)
+                if not self.get_player(member["masterId"]):
+                    continue
+
                 self.team.append(
                     Invocation(member["id"], self.get_player(member["masterId"]))
                 )
