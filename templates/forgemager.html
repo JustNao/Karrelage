@@ -1,0 +1,76 @@
+{% extends 'base.html' %} {% block script %}
+<script type="text/javascript">
+  setInterval(function () {
+    location.reload();
+  }, 500);
+
+  function update_reliquat(data) {
+    $.post("/update", { data: data }, function (data) {
+      location.reload();
+    });
+  }
+</script>
+{% endblock %} {% block content %}
+<div class="flex flex-col space-y-4">
+  <div
+    class="flex flex-col w-full h-fit justify-center items-center bg-black/80 rounded-md px-10 py-6"
+  >
+    {% if name is none %}
+    <div id="item" name="{{name}}">You need to load an item first</div>
+    {% else %}
+    <div class="self-start">
+      <div class="flex flex-col w-full mb-2">
+        <span class="text-lg"><b>{{name}}</b></span>
+        <span class="text-sm text-gray-300 -mt-0.5">Niveau {{level}}</span>
+      </div>
+    </div>
+    <div class="text-green-300 font-bold">Reliquat</div>
+    <div class="text-green-300 text-3xl font-bold mt-1.5">{{ reliquat }}</div>
+    <div class="flex items-center">
+      <button
+        type="button"
+        class="text-white border hover:text-white border-none focus:outline-none font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center"
+        onclick="update_reliquat(1)"
+      >
+        <svg
+          class="w-[18px] h-[18px] text-green-700 dark:text-white"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 18 18"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 1v16M1 9h16"
+          />
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="text-white border hover:text-white border-none focus:outline-none font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center"
+        onclick="update_reliquat(-1)"
+      >
+        <svg
+          class="w-[18px] h-[18px] text-red-700 dark:text-white"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 18 2"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M1 1h16"
+          />
+        </svg>
+      </button>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

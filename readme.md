@@ -32,6 +32,7 @@
       <ul>
         <li><a href="#module-hdv">HDV Filter</a></li>
         <li><a href="#module-team-manager">Team Manager</a></li>
+        <li><a href="#module-forgemager">Forgemager</a></li>
       </ul>
     </li>
     <li>
@@ -113,6 +114,14 @@ Ce module est un outil multicompte combiné à un récap d'équipe.
 
 [![Team Manager Screenshot][team-screenshot]](https://example.com)
 
+### Forgemager
+
+<a name="module-forgemager"></a>
+
+Forgemager est un module de calcul automatique du reliquat. Il suit les runes utilisées ainsi que les résultats de chaque tentative, et vous affiche le reliquat disponible à un moment donné. Vous pouvez aussi manuellement augmenter/diminuer le reliquat manuellement, si vous commencez un FM avec déjà du reliquat sur l'item par exemple.
+
+[![Forgemager screenshot][forgemager-screenshot]](https://postimg.cc/v1wzQj3m)
+
 ## Lecture de packets
 
 <a name="packet-read"></a>
@@ -166,3 +175,4 @@ Merci à [LaBot](https://github.com/louisabraham/LaBot) pour son reader/writer d
 [team-screenshot]: https://i.postimg.cc/mkMQQgW0/Screenshot-2023-03-21-183926.png
 [hdv-screenshot]: https://i.postimg.cc/7Yk5d8cV/Screenshot-2023-03-21-183619.png
 [hdv-screenshot2]: https://i.postimg.cc/cLGBFbMy/Screenshot-2023-03-21-183925.png
+[forgemager-screenshot]: https://i.postimg.cc/g0nBKbh3/image.png

@@ -2,7 +2,6 @@ from .i18n import i18n
 from .utils import load
 
 itemJs = load("Items")
-itemToName = {}
 
 items = {}
 for item in itemJs:
@@ -14,6 +13,14 @@ for item in itemJs:
         }
     except KeyError:
         pass
+
+
+def item(id):
+    try:
+        return items[id]
+    except KeyError:
+        return "Unknown"
+
 
 ressourcesId = {
     104: "Aile",

@@ -19,6 +19,7 @@ manager = Manager(
         ("HDV Filter", "hdv_filter", "HDVFilter"),
         ("Team Manager", "team_manager", "TeamManager"),
         ("Biscuit", "biscuit", "Biscuit"),
+        ("Forgemager", "forgemager", "Forgemager"),
     ],
 )
 module = None
@@ -44,6 +45,17 @@ def biscuit():
         "biscuit.html",
         config=module.config,
         houses=module.houses,
+    )
+
+
+@app.route("/forgemager")
+def forgemager():
+    name, reliquat, level = module.get_item()
+    return render_template(
+        "forgemager.html",
+        name=name,
+        reliquat=reliquat,
+        level=level,
     )
 
 
