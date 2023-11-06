@@ -1,4 +1,6 @@
 from src.sniffer import protocol
+import json
+import time
 
 
 class DofusModule:
@@ -25,3 +27,6 @@ class DofusModule:
 
     def update(self, data):
         pass
+
+    def get_data(self):
+        return {}

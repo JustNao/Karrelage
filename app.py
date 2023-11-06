@@ -20,6 +20,7 @@ manager = Manager(
         ("Team Manager", "team_manager", "TeamManager"),
         ("Biscuit", "biscuit", "Biscuit"),
         ("Forgemager", "forgemager", "Forgemager"),
+        ("Debug", "debug", "Debug"),
     ],
 )
 module = None
@@ -45,6 +46,12 @@ def biscuit():
         "biscuit.html",
         config=module.config,
         houses=module.houses,
+    )
+
+@app.route("/debug")
+def debug():
+    return render_template(
+        "debug.html",
     )
 
 
@@ -144,6 +151,15 @@ def update():
         data = request.form["data"]
         module.update(data)
     return "ok"
+
+@app.route("/refresh", methods=["GET"])
+def refresh():
+    if request.method == "GET":
+        data = module.get_data()
+        return data
+    return "ok"
+
+
 
 
 @app.route("/switch_type", methods=["GET", "POST"])

@@ -1,0 +1,176 @@
+{% extends 'base.html' %} {% block script %}
+<script type="text/javascript">
+  var packets = [];
+  var packet_index = 0;
+  var table;
+  var viewer;
+  var filter_input;
+  var filter_packet;
+  var expanded = true;
+
+  setTimeout(() => {
+    table = document.getElementById("table-body");
+    viewer = document.querySelector("#json");
+    filter_input = document.getElementById("filter-input");
+    filter_packet = document.getElementById("filter-packet");
+    table.innerHTML = "";
+  }, 300);
+  setInterval(function () {
+    refresh_data(table);
+  }, 500);
+
+  function filter_packets() {
+    for (var i = 0; i < table.children.length; i++) {
+        table.children[i].style.display = filter_display(table.children[i].children[0].textContent);
+      }
+  }
+
+  function filter_display(type) {
+    if (type.toLowerCase().includes(filter_packet.value.toLowerCase())) {
+      return "";
+    } else {
+      return "none";
+    }
+  }
+
+  function filter() {
+    value = ".*" + filter_input.value + ".*";
+    if (value == ".*.*") {
+      viewer.resetFilter();
+    }
+    regex = new RegExp(value, "i");
+    viewer.filter(regex);
+  }
+
+  function expand_collapse() {
+    if (expanded) {
+      viewer.collapseAll();
+    } else {
+      viewer.expandAll();
+    }
+    expanded = !expanded;
+  }
+
+  function show_packet(index) {
+    packet = packets[index]["packet"];
+    document.querySelector("#json").data = packet;
+    viewer.resetFilter();
+    filter_input.value = "";
+    filter_input.dispatchEvent(new Event(""));
+    viewer.expandAll();
+  }
+
+  function createAndAppendTableRow(packetIndex, type, timestamp, size) {
+    var tr = document.createElement("div");
+    tr.className =
+      "border border-zinc-500 hover:bg-black cursor-pointer duration-100 flex flex-row items-center justify-between";
+    tr.onclick = function () {
+      show_packet(packetIndex);
+    };
+    tr.style.display = filter_display(type);
+
+    var td1 = document.createElement("div");
+    td1.className =
+      "px-6 py-2 max-w-[20rem] text-ellipsis flex-nowrap overflow-hidden";
+    td1.textContent = type;
+    tr.appendChild(td1);
+
+    var td2 = document.createElement("div");
+    td2.className = "px-4 py-2 mr-0 ml-auto";
+    td2.textContent = timestamp;
+    tr.appendChild(td2);
+
+    var td3 = document.createElement("div");
+    td3.className = "px-4 py-2 w-24";
+    td3.textContent = size;
+    tr.appendChild(td3);
+
+    var parentDiv = document.getElementById("table-body");
+
+    parentDiv.appendChild(tr);
+  }
+
+  function refresh_data(table) {
+    $.get("/refresh", function (data) {
+      if ("packets" in data) {
+        packets.push(...data["packets"]);
+        data["packets"].forEach((event) => {
+          packet = event["packet"];
+          type = packet["__type__"];
+          timestamp = event["timestamp"];
+          size = event["size"];
+          createAndAppendTableRow(packet_index, type, timestamp, size);
+          packet_index += 1;
+        });
+      }
+    });
+  }
+
+  window.resizeTo(1440, 850);
+</script>
+
+{% endblock %} {% block content %}
+
+<div class="flex flex-col w-4/5 h-4/5">
+  <div>
+    <input id="filter-packet" class="w-48 h-10 mr-3 mt-3 px-2 rounded-md text-black" oninput="filter_packets()"></input>
+    <button
+      type="button"
+      class="text-white border border-white hover:bg-white hover:text-black rounded-md mb-3 px-3 py-1 text-lg"
+      onclick="location.reload()"
+    >
+      Clear
+    </button>
+  </div>
+  <div class="flex flex-row space-x-4 w-full h-full">
+    <div class="text-white text-sm text-left min-w-[38rem] flex flex-col">
+      <div
+        class="text-lg uppercase border border-zinc-500 rounded-t-md bg-zinc-800"
+      >
+        <div class="flex flex-row justify-between">
+          <div scope="col" class="px-6 py-2">type</div>
+          <div scope="col" class="px-6 py-2 ml-auto">timestamp</div>
+          <div scope="col" class="px-6 py-2 mr-9">size</div>
+        </div>
+      </div>
+      <div
+        id="table-body"
+        class="scroll-smooth overflow-auto border flex flex-col text-sm"
+        style="scrollbar-gutter: stable;"
+      ></div>
+    </div>
+    <div
+      class="bg-zinc-800 rounded-md min-w-[32rem] w-fit min-h-[30rem] overflow-auto no-scrollbar relative"
+    >
+      <button
+        class="absolute top-4 right-4 cursor-pointer z-20"
+        onclick="expand_collapse()"
+      >
+        <svg
+          class="w-6 h-6 text-white"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 10 16"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5 5 1 1 5m0 6 4 4 4-4"
+          />
+        </svg>
+      </button>
+      <div class="flex flex-col">
+        <input id="filter-input" class="w-48 h-8 mx-3 mt-3 px-2 rounded-md text-black" oninput="filter()"></input>
+        <json-viewer
+          id="json"
+          style="--background-color: transparent"
+          class="pl-3 select-text scroll-smooth text-sm z-10"
+        ></json-viewer>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
