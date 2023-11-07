@@ -111,9 +111,9 @@
 
 {% endblock %} {% block content %}
 
-<div class="flex flex-col w-4/5 h-4/5">
+<div class="flex flex-col w-4/5 h-4/5 max-h-[4/5] self-start mt-9">
   <div>
-    <input id="filter-packet" class="w-48 h-10 mr-3 mt-3 px-2 rounded-md text-black" oninput="filter_packets()"></input>
+    <input id="filter-packet" class="w-48 h-10 mr-3 mt-3 px-2 rounded-md text-black" oninput="filter_packets()" placeholder="filter"></input>
     <button
       type="button"
       class="text-white border border-white hover:bg-white hover:text-black rounded-md mb-3 px-3 py-1 text-lg"
@@ -162,8 +162,8 @@
           />
         </svg>
       </button>
-      <div class="flex flex-col">
-        <input id="filter-input" class="w-48 h-8 mx-3 mt-3 px-2 rounded-md text-black" oninput="filter()"></input>
+      <div class="flex flex-col h-full">
+        <input id="filter-input" class="w-48 h-8 mx-3 mt-3 px-2 rounded-md text-black" oninput="filter()" placeholder="filter"></input>
         <json-viewer
           id="json"
           style="--background-color: transparent"
