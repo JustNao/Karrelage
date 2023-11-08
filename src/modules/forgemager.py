@@ -41,6 +41,7 @@ class Item:
 
     def update_reliquat(self, reliquat):
         self.reliquat += reliquat
+        self.reliquat = min(self.reliquat, 99)
 
 
 class Forgemager(DofusModule):
