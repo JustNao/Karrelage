@@ -6,9 +6,9 @@ import keyboard as kb
 import win32gui as w32
 from .base import DofusModule
 from src.entities.utils import load, kamasToString
-from src.entities.id import monsterToName
+from src.entities.id import get_monster_name
 from src.entities.media import play_sound
-from src.entities.maps import mapToPositions
+from src.entities.maps import get_map_positions
 from src.utils.externals import Vulbis
 from datetime import datetime, timezone
 from dateutil import parser, relativedelta
@@ -128,7 +128,7 @@ class Biscuit(DofusModule):
         self.save_config()
 
     def save_abandonned_house(self, map_id):
-        x, y = mapToPositions(map_id)
+        x, y = get_map_positions(map_id)
         position_string = f"[{x},{y}]"
         mode = "a" if len(self.houses) > 0 else "w"
 
@@ -187,7 +187,7 @@ class Biscuit(DofusModule):
                     )  # Main monster
                     monsters += entity["staticInfos"]["underlings"]  # Underlings
                     for monster in monsters:
-                        monster_name = monsterToName(monster["genericId"])
+                        monster_name = get_monster_name(monster["genericId"])
                         if monster_name in self.archimonstres:
                             play_sound("spotted")
                             return

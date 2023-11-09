@@ -5,7 +5,8 @@ mapToPositions_dict = {map["id"]: (map["posX"], map["posY"]) for map in mapPosit
 del mapPositions
 
 
-def mapToPositions(map_id: float) -> tuple[int, int]:
+def get_map_positions(map_id: int) -> tuple[int, int]:
+    """Returns the position of a map from its id"""
     try:
         return mapToPositions_dict[map_id]
     except KeyError:
