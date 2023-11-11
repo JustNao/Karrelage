@@ -17,3 +17,5 @@ pyperclip
 python-dateutil
 playsound
 undetected_chromedriver
+pyqt5
+pynput

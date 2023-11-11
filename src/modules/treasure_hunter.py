@@ -1,24 +1,19 @@
 import json
-import sys
-import os
-import math
-from random import random
-import pyautogui as ag
-from src.entities.id import get_monster_name, get_poi_name
-from src.entities.maps import get_map_positions
+from threading import Thread
 import time
 import pyperclip
-from seleniumwire import webdriver
+import pygetwindow
+import pyautogui as ag
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from seleniumwire.utils import decode
+from src.entities.id import get_monster_name, get_poi_name
+from src.entities.maps import get_map_positions
 from src.entities.utils import load
-import pygetwindow
-import pyautogui
+from src.utils.qt import ConfigUI
+from src.modules.base import DofusModule
 
-
-class TreasureHuntHelper:
+class TreasureHunter(DofusModule):
     def __init__(self):
         # Running selenium webdriver in the background to simulate the user's clicks on the site
         # options = Options()
@@ -36,14 +31,14 @@ class TreasureHuntHelper:
         self.check_positions = []
         self.phorreur = {"lookingFor": False, "npcId": 2673}
         self.autopilot = False
-        self.initBotting()
         self.autopilotMoving = False
         self.relevant_monsters = load("Archi")
-        dofus_windows = pygetwindow.getWindowsWithTitle("- Dofus")
-        if len(dofus_windows) > 0:
-            self.dofus_window = dofus_windows[0]
-        else:
-            raise Exception("Dofus needs to be launched before starting the bot")
+        # dofus_windows = pygetwindow.getWindowsWithTitle("- Dofus")
+        # if len(dofus_windows) > 0:
+        #     self.dofus_window = dofus_windows[0]
+        # else:
+        #     raise Exception("Dofus needs to be launched before starting the bot")
+        self.setup_ui()
 
     class Hint:
         def __init__(self, posX=0, posY=0, x_d=666, y_d=666):
@@ -54,6 +49,14 @@ class TreasureHuntHelper:
 
         def __str__(self):
             return "[" + str(self.x) + "," + str(self.y) + "]"
+
+        def __eq__(self, obj):
+            return (
+                hasattr(obj, "x")
+                and hasattr(obj, "y")
+                and obj.x == self.x
+                and obj.y == self.y
+            )
 
     class Position:
         def __init__(self, posX=-25, posY=-36):
@@ -112,6 +115,10 @@ class TreasureHuntHelper:
 
     def next_step(self):
         pass
+
+    def setup_ui(self):
+        self.config_ui = ConfigUI()
+        self.config_positions = self.config_ui.start_loop()
 
     def handle_CurrentMapMessage(self, packet):
         """Triggered when the player changes map"""

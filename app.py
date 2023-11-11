@@ -17,6 +17,7 @@ manager = Manager(
     modules=[
         # Display string, module name, class name
         ("HDV Filter", "hdv_filter", "HDVFilter"),
+        ("Treasure Hunter", "treasure_hunter", "TreasureHunter"),
         ("Team Manager", "team_manager", "TeamManager"),
         ("Biscuit", "biscuit", "Biscuit"),
         ("Forgemager", "forgemager", "Forgemager"),
@@ -52,6 +53,12 @@ def biscuit():
 def debug():
     return render_template(
         "debug.html",
+    )
+
+@app.route("/treasure_hunter")
+def treasure_hunter():
+    return render_template(
+        "treasure_hunter.html",
     )
 
 

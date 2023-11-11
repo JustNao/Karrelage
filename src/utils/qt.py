@@ -2,6 +2,8 @@ from PyQt5.QtWidgets import QApplication, QLabel, QWidget
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette, QColor, QFont, QPainter, QPen
 import pyautogui as pg
+from pynput import mouse
+import keyboard
 import sys
 
 
@@ -19,12 +21,22 @@ class LineWidget(QWidget):
 
 
 class ConfigUI:
-    def __init__(self, first_text: str, click_callback) -> None:
+    def __init__(self) -> None:
         self.app = QApplication(sys.argv)
         self.setup_line_widget()
-        self.setup_label(first_text)
-        pg.mouseListener(on_click=click_callback)
+        self.setup_label("Click on the left side of the screen")
+        self.listener = mouse.Listener(on_click=self.on_click)
+        self.listener.start()
+        keyboard.on_press_key(key="esc", callback=self.stop_loop)
         self.app.processEvents()
+        self.loop = True
+        self.text_prompts = [
+            "Click on the left side of the screen",
+            "Click on the right side of the screen",
+            "Click on the top side of the screen",
+            "Click on the bottom side of the screen",
+        ]
+        self.positions = []
 
     def setup_line_widget(self):
         line_widget = LineWidget()
@@ -65,16 +77,28 @@ class ConfigUI:
         self.label.close()
         self.line.close()
         self.app.quit()
+        self.listener.stop()
 
-    def loop(self):
-        x, y = pg.position()
-        self.line.x, self.line.y = x, y
-        self.line.repaint()
-        label_width = self.label.fontMetrics().boundingRect(self.label.text()).width()
-        self.label.move(x - label_width // 2, y - 30)
+    def start_loop(self):
+        while self.loop:
+            x, y = pg.position()
+            self.line.x, self.line.y = x, y
+            self.line.repaint()
+            label_width = self.label.fontMetrics().boundingRect(self.label.text()).width()
+            self.label.move(x - label_width // 2, y - 30)
+        return self.positions
 
+    def stop_loop(self):
+        self.loop = False
+        print(self.positions)
+        self.close()
 
-def on_click(x, y, button, pressed):
-    if button == pg.LEFT:
-        if pressed:
-            positions.append((x, y))
+    def on_click(self, x, y, button, pressed):
+        if button == pg.LEFT:
+            if pressed:
+                self.positions.append((x, y))
+                if len(self.positions) == 4:
+                    self.stop_loop()
+                    self.close()
+                self.update_text(self.text_prompts[len(self.positions)])
+
