@@ -17,5 +17,4 @@ pyperclip
 python-dateutil
 playsound
 undetected_chromedriver
-pyqt5
-pynput
+git+https://github.com/JustNao/Py3AMF.git@master
