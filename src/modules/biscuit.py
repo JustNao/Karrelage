@@ -4,14 +4,17 @@ import os
 import requests as rq
 import keyboard as kb
 import win32gui as w32
+from datetime import datetime, timezone
+from dateutil import parser, relativedelta
+
 from .base import DofusModule
+from utils.data import load_dat
 from src.entities.utils import load, kamasToString
 from src.entities.id import get_monster_name
 from src.entities.media import play_sound
 from src.entities.maps import get_map_positions
 from src.utils.externals import Vulbis
-from datetime import datetime, timezone
-from dateutil import parser, relativedelta
+from src.entities.item import get_recipe
 
 
 class Commander:
@@ -27,6 +30,12 @@ class Commander:
             2: "/g",
             4: "/p",
         }
+        local_prices = load_dat("itemAveragePrices")
+        if not "Draconiros" in local_prices:
+            print("Local prices for Draconiros not found, $price command will not work")
+            self.local_prices = None
+        else:
+            self.local_prices = local_prices["Draconiros"]["items"]
 
     def send_message(self, message):
         pyperclip.copy(message)
@@ -73,14 +82,32 @@ class Commander:
                 f"{self.channels[channel]} Portail {zone} dernièrement vu en [{pos_x},{pos_y}] il y'a {time}"
             )
 
+    def get_craft_price(self, item_id: int):
+        recipe = get_recipe(item_id)
+        if not recipe:
+            return self.local_prices[str(item_id)]
+
+        total_price = 0
+        for ingredient_id, quantity in zip(
+            recipe["ingredientIds"], recipe["quantities"]
+        ):
+            total_price += self.get_craft_price(ingredient_id) * quantity
+
+        return total_price
+
     def price(self, packet, channel: int):
+        if not self.local_prices:
+            return
+
         gid = packet["objects"][0]["objectGID"]
-        price = Vulbis.get_craft_price(gid)
-        if price is None:
-            self.send_message(f"{self.channels[channel]} Prix de craft: inconnu")
+        price = self.get_craft_price(gid)
+        if not price:
+            self.send_message(
+                f"{self.channels[channel]} Prix de craft : inconnu. Un des items n'est pas dans la base de données"
+            )
             return
         self.send_message(
-            f"{self.channels[channel]} Prix de craft: {kamasToString(price)} K"
+            f"{self.channels[channel]} Prix de craft estimé : {kamasToString(price)} K"
         )
 
 

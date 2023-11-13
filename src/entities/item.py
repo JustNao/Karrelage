@@ -2,6 +2,7 @@ from .i18n import i18n
 from .utils import load
 
 itemJs = load("Items")
+recipeJs = load("Recipes")
 
 items = {}
 for item in itemJs:
@@ -13,6 +14,20 @@ for item in itemJs:
         }
     except KeyError:
         pass
+
+recipes = {}
+for recipe in recipeJs:
+    recipes[recipe["resultId"]] = {
+        "ingredientIds": recipe["ingredientIds"],
+        "quantities": recipe["quantities"],
+    }
+
+
+def get_recipe(id):
+    try:
+        return recipes[id]
+    except KeyError:
+        return None
 
 
 def item(id):
