@@ -1,9 +1,75 @@
 {% extends 'base.html' %} {% block script %}
 <script type="text/javascript">
-
+  const update_config = (key, value = null) => {
+    console.log(key, value);
+    $.post("/update", {
+      data: key + ":" + value,
+    });
+  };
 </script>
 {% endblock %} {% block content %}
 <div class="flex flex-col space-y-4">
-
+  <div class="flex flex-row items-center">
+    <label class="relative inline-flex items-center cursor-pointer">
+      {% if config['autopilot'] %}
+      <input
+        type="checkbox"
+        value=""
+        class="sr-only peer"
+        checked
+        onclick="update_config('autopilot')"
+      />
+      {% else %}
+      <input
+        type="checkbox"
+        value=""
+        class="sr-only peer"
+        onclick="update_config('autopilot')"
+      />
+      {% endif %}
+      <div
+        class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-700"
+      ></div>
+      <span class="ml-3 text-sm text-gray-300">Autopilot</span>
+    </label>
+    <button
+      data-popover-target="popover-commands"
+      data-popover-placement="top"
+      type="button"
+    >
+      <svg
+        class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500"
+        aria-hidden="true"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    </button>
+    <div
+      data-popover
+      id="popover-commands"
+      role="tooltip"
+      class="absolute z-10 invisible inline-block w-80 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0"
+    >
+      <div class="px-3 py-2">
+        <p>
+          Va envoyer une commande d'autopilot
+          <kbd
+            class="px-1.5 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500"
+          >
+            /travel x y
+          </kbd>
+          pour lancer un déplacement automatique à chaque nouvel indice. Les
+          phorreurs toujours cherchés au click.
+        </p>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

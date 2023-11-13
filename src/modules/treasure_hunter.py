@@ -44,6 +44,16 @@ class TreasureHunter(DofusModule):
             raise Exception("Dofus needs to be launched before starting the bot")
         self.setup_bot()
 
+    def get_config(self):
+        return {
+            "autopilot": self.autopilot,
+        }
+
+    def update(self, data):
+        key, value = data.split(":")
+        if hasattr(self, key):
+            setattr(self, key, value)
+
     # TODO: some cleanup between Hint and Position, they're basically the same
     class Hint:
         def __init__(self, posX=0, posY=0, x_d=666, y_d=666):

@@ -49,17 +49,17 @@ def biscuit():
         houses=module.houses,
     )
 
+
 @app.route("/debug")
 def debug():
     return render_template(
         "debug.html",
     )
 
+
 @app.route("/treasure_hunter")
 def treasure_hunter():
-    return render_template(
-        "treasure_hunter.html",
-    )
+    return render_template("treasure_hunter.html", config=module.get_config())
 
 
 @app.route("/forgemager")
@@ -159,14 +159,13 @@ def update():
         module.update(data)
     return "ok"
 
+
 @app.route("/refresh", methods=["GET"])
 def refresh():
     if request.method == "GET":
         data = module.get_data()
         return data
     return "ok"
-
-
 
 
 @app.route("/switch_type", methods=["GET", "POST"])
