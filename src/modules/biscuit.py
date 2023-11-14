@@ -83,6 +83,9 @@ class Commander:
             )
 
     def get_craft_price(self, item_id: int):
+        if not self.local_prices:
+            return None
+
         recipe = get_recipe(item_id)
         if not recipe:
             return self.local_prices[str(item_id)]
@@ -96,9 +99,6 @@ class Commander:
         return total_price
 
     def price(self, packet, channel: int):
-        if not self.local_prices:
-            return
-
         gid = packet["objects"][0]["objectGID"]
         price = self.get_craft_price(gid)
         if not price:
@@ -150,7 +150,7 @@ class Biscuit(DofusModule):
         if value == "null":
             self.config[key] = not self.config[key]
         else:
-            self.config[key] = value
+            self.config[key] = bool(value)
 
         self.save_config()
 

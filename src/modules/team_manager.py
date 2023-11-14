@@ -185,7 +185,7 @@ class Player:
 
 
 class Invocation:
-    def __init__(self, id=0, summoner: Player = None):
+    def __init__(self, id, summoner: Player):
         self.id = id
         self.summoner = summoner
 
@@ -209,10 +209,11 @@ class TeamManager(DofusModule):
         windows = ag.getAllTitles()  # type: ignore
         self.windows = [x for x in windows if re.search("- Dofus \d\.", x)]  # type: ignore
         self.player_characters = [(window.split()[0]) for window in self.windows]
-        self.team: list[Player] = []
+        self.team: list[Player | Invocation] = []
         self.buffer_team = {}
         self.buffer = []
         self.fighting = False
+        self.long_term_storage = {}
 
         mouse.on_middle_click(self.all_move)
 
@@ -227,7 +228,7 @@ class TeamManager(DofusModule):
                 self.player_characters.append(name)
 
     def get_window(self, name):
-        dofus_windows = [x for x in ag.getAllTitles() if re.search("- Dofus \d\.", x)]
+        dofus_windows = [x for x in ag.getAllTitles() if re.search("- Dofus \d\.", x)]  # type: ignore
         for window in dofus_windows:
             if name in window:
                 return win32gui.FindWindow(
@@ -252,7 +253,7 @@ class TeamManager(DofusModule):
 
     def get_player(self, id):
         for player in self.team:
-            if player.id == id:
+            if isinstance(player, Player) and player.id == id:
                 return player
         return None
 
@@ -275,13 +276,22 @@ class TeamManager(DofusModule):
                 displayable_team.append(vars(entity))
         return displayable_team
 
-    def update(self, id):
+    def add_to_team(self, entity: Player | Invocation):
+        if isinstance(entity, Player):
+            if entity.id in self.long_term_storage:
+                entity.auto_turn = self.long_term_storage[entity.id]
+        self.team.append(entity)
+
+    def update(self, id: str):
         player = self.get_player(int(id))
+        if not player:
+            raise Exception("Player not found")
         player.toggle_auto_turn()
+        self.long_term_storage[int(id)] = player.auto_turn
 
     def send_keystroke(self, window, key=0x56):
-        win32api.SendMessage(window, win32con.WM_KEYDOWN, key, 0)
-        win32api.SendMessage(window, win32con.WM_KEYUP, key, 0)
+        win32api.SendMessage(window, win32con.WM_KEYDOWN, key, 0)  # type: ignore
+        win32api.SendMessage(window, win32con.WM_KEYUP, key, 0)  # type: ignore
 
     def handle_GameFightStartingMessage(self, _):
         """Triggered when the fight starts."""
@@ -407,12 +417,10 @@ class TeamManager(DofusModule):
             if "masterId" in member:
                 # Need to check if the masteId is already registered, because sometimes
                 # we get the invocation before the master (and then again after the master)
-                if not self.get_player(member["masterId"]):
+                invoc_master = self.get_player(member["masterId"])
+                if not invoc_master:
                     continue
-
-                self.team.append(
-                    Invocation(member["id"], self.get_player(member["masterId"]))
-                )
+                self.add_to_team(Invocation(member["id"], invoc_master))
                 continue
 
             # New team member
@@ -442,7 +450,7 @@ class TeamManager(DofusModule):
                             sex=int(member["sex"]),
                         )
 
-                self.team.append(player)
+                self.add_to_team(player)
 
     def handle_RefreshCharacterStatsMessage(self, packet):
         """Triggered when the stats of an entity are updated."""
@@ -535,4 +543,4 @@ class TeamManager(DofusModule):
             id=packet["summons"][0]["summons"][0]["informations"]["contextualId"],
             summoner=source_player,
         )
-        self.team.append(invoc)
+        self.add_to_team(invoc)
