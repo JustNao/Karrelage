@@ -16,11 +16,11 @@ app = Flask(__name__)
 manager = Manager(
     modules=[
         # Display string, module name, class name
-        ("HDV Filter", "hdv_filter", "HDVFilter"),
-        ("Treasure Hunter", "treasure_hunter", "TreasureHunter"),
-        ("Team Manager", "team_manager", "TeamManager"),
         ("Biscuit", "biscuit", "Biscuit"),
+        ("HDV Filter", "hdv_filter", "HDVFilter"),
+        ("Team Manager", "team_manager", "TeamManager"),
         ("Forgemager", "forgemager", "Forgemager"),
+        ("Treasure Hunter", "treasure_hunter", "TreasureHunter"),
         ("Debug", "debug", "Debug"),
     ],
 )
