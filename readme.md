@@ -68,12 +68,14 @@ Karrelage est un MITM pour Dofus 2.XX en Python 3. C'est la suite de [DofusHelpe
 2. Ajouter PIP (installé avec les dernières versions de Python) [à votre Path](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/). Si vous n'avez rien touché à l'installation de python, le dossier à ajouter devrait être
    'C:\Program Files\Python3XX\Scripts'.
 3. Installer Npcap <= [1.60](https://npcap.com/dist/npcap-1.60.exe)
-4. Exporter le git (bash, zip, ...)
-5. Installer les packages python
+4. Installer [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+5. Exporter le git (bash, zip, ...)
+6. Installer les packages python
    ```sh
    pip install -r requirements.txt
    ```
-6. Lancer l'interface par la commande
+   ou en lançant le fichier `install.bat`.
+7. Lancer l'interface par la commande
    ```sh
    python app.py
    ```
@@ -89,7 +91,7 @@ Karrelage est un MITM pour Dofus 2.XX en Python 3. C'est la suite de [DofusHelpe
 Karrelage utilise un système de module pour gérer les paquets reçus. Un module est un fichier python qui contient une classe qui hérite de la classe `DofusModule`. Cette classe contient une méthode `handle_packet` qui parse les messages reçus par le client, et envoie le packet avec à la fonction correspondante du module (sous la forme `handle_<packet_name>`).
 Le menu de Karrelage permet de sélectionner quel module lancer. Actuellement, un seul module peut être lancé à la fois.
 
-[![Menu Screenshot][menu-screenshot]](https://example.com)
+[![Menu Screenshot][menu-screenshot]](#)
 
 ### Module HDV Filter
 
@@ -121,6 +123,32 @@ Ce module est un outil multicompte combiné à un récap d'équipe.
 Forgemager est un module de calcul automatique du reliquat. Il suit les runes utilisées ainsi que les résultats de chaque tentative, et vous affiche le reliquat disponible à un moment donné. Vous pouvez aussi manuellement augmenter/diminuer le reliquat manuellement, si vous commencez un FM avec déjà du reliquat sur l'item par exemple.
 
 [![Forgemager screenshot][forgemager-screenshot]](https://postimg.cc/v1wzQj3m)
+
+### Biscuit
+
+<a name="module-biscuit"></a>
+
+Biscuit est un module "Quality of Life". Il est destiné à être laissé en arrière plan, si un autre module n'est pas déjà en cours d'execution. C'est ici que je mets toutes les idées de petites fonctionnalités utiles qui n'ont pas de raison d'avoir un module à part. Pour l'instant, il y'a :
+
+- Un système de commandes, utilisables en jeu. Il suffit d'utiliser le canal de guilde `/g` our groupe `/p`, et de lancer les commander avec `$command`. Par exemple, `$price` suivi d'un link (Ctrl+shift) d'un item va calculer le prix de craft estimé à partir de la recette, et du prix moyen des ressources associées. `$srambad` et les autres variantes de dimension va afficher la position des portails de la dimension en question. Les réponses sont envoyées dans le chat actuel.
+- Une détection d'archimonstre & d'avis de recherche (un son est joué en entrant sur la map), et une détection de maisons abandonnées seules (qui seront donc mises en vente au mois prochain).
+  L'interface permet de choisir quels outils utiliser.
+
+[![Biscuit screenshot][biscuit-screenshot]](#)
+
+### Treasure Hunter
+
+<a name="module-treasure-hunter"></a>
+
+Treasure Hunter est un bot chasse aux trésors. Une fois celui-ci ouvert, lancez une chasse au trésor. Pour la première étape rien ne va se passer, mais une fois que allez arriver vers la position de lancement, il va aller à chaque indice automatiquement. L'interface affiche pour l'instant uniquement une option d'autopilot, qui va utiliser votre monture autopilotée à la place d'un clic sur les bords de l'écran. Pour trouver les indices, Treasure Hunter ouvre en background une fenêtre Chrome (contrôlée par Selenium), et utilise [DofusDB](https://dofusdb.fr/fr/tools/treasure-hunt) pour dynamiquement obtenir la position des indices.
+
+### Debug
+
+<a name="module-debug"></a>
+
+Ici c'est juste un module de debug qui permet de parcourir tous les packets reçus. On affiche le type de packet, timestamp et packet size. Si vous sélectionnez un packet, son contenu en format json est affiché. On peut filtrer les types et le contenu des packets.
+
+[![Debug screenshot][debug-screenshot]](#)
 
 ## Lecture de packets
 
@@ -171,8 +199,10 @@ Merci à [LaBot](https://github.com/louisabraham/LaBot) pour son reader/writer d
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[menu-screenshot]: https://i.postimg.cc/kXNcDRHP/Screenshot-2023-03-21-183926.png
+[menu-screenshot]: https://i.postimg.cc/85c8j0cG/image.png
 [team-screenshot]: https://i.postimg.cc/mkMQQgW0/Screenshot-2023-03-21-183926.png
 [hdv-screenshot]: https://i.postimg.cc/7Yk5d8cV/Screenshot-2023-03-21-183619.png
 [hdv-screenshot2]: https://i.postimg.cc/cLGBFbMy/Screenshot-2023-03-21-183925.png
 [forgemager-screenshot]: https://i.postimg.cc/g0nBKbh3/image.png
+[biscuit-screenshot]: https://i.postimg.cc/Nf9H1sS9/image.png
+[debug-screenshot]: https://i.postimg.cc/K8KhGVKy/image.png
