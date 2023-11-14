@@ -293,7 +293,7 @@ class TeamManager(DofusModule):
         win32api.SendMessage(window, win32con.WM_KEYDOWN, key, 0)  # type: ignore
         win32api.SendMessage(window, win32con.WM_KEYUP, key, 0)  # type: ignore
 
-    def handle_GameFightStartingMessage(self, _):
+    def handle_GameFightJoinMessage(self, _):
         """Triggered when the fight starts."""
 
         if not self.fighting:
