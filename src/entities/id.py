@@ -1,7 +1,6 @@
 from .utils import load
 from .i18n import i18n
 
-textId = load("textId")
 monsterJs = load("Monsters")
 poiJs = load("PointOfInterest")
 poi_dict = {}
