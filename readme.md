@@ -33,6 +33,9 @@
         <li><a href="#module-hdv">HDV Filter</a></li>
         <li><a href="#module-team-manager">Team Manager</a></li>
         <li><a href="#module-forgemager">Forgemager</a></li>
+        <li><a href="#module-biscuit">Biscuit</a></li>
+        <li><a href="#module-treasure-hunter">Treasure Hunter</a></li>
+        <li><a href="#module-debug">Debug</a></li>
       </ul>
     </li>
     <li>
@@ -186,7 +189,7 @@ npx tailwindcss -i ./static/src/input.css -o ./static/dist/css/output.css --watc
 
 <a name="copyright"></a>
 
-Merci à [LaBot](https://github.com/louisabraham/LaBot) pour son reader/writer de packet.
+Merci à [LaBot](https://github.com/louisabraham/LaBot) pour son reader/writer de packet et [balciseri](https://github.com/balciseri/PyDofus) pour son reader/writer de fichiers Dofus.
 
 ## License
 
