@@ -15,6 +15,6 @@ requests
 python-dotenv
 pyperclip
 python-dateutil
-playsound
+playsound==1.2.2
 undetected_chromedriver
 git+https://github.com/JustNao/Py3AMF.git@master
