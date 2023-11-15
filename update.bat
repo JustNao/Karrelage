@@ -5,6 +5,9 @@ IF NOT EXIST ".git" (
     echo Initializing Git repository...
     git init
     git remote add origin https://github.com/JustNao/Karrelage.git
+    git fetch origin
+    git branch -t master origin/master
+    git branch --set-upstream-to=origin/master master
     echo Git repository initialized and remote set.
 )
 
