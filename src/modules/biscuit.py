@@ -15,6 +15,7 @@ from src.entities.media import play_sound
 from src.entities.maps import get_map_positions
 from src.utils.externals import Vulbis
 from src.entities.item import get_recipe
+from src.entities.i18n import id_to_name
 
 
 class Commander:
@@ -25,6 +26,7 @@ class Commander:
             "xelorium": lambda _, channel: self.portals("xelorium", channel),
             "ecaflipus": lambda _, channel: self.portals("ecaflipus", channel),
             "price": lambda packet, channel: self.price(packet, channel),
+            "regen": lambda _, channel: self.regen(channel),
         }
         self.channels = {
             2: "/g",
@@ -110,6 +112,49 @@ class Commander:
             f"{self.channels[channel]} Prix de craft estimé : {kamasToString(price)} K"
         )
 
+    def regen(self, channel):
+        items = load("Items")
+        if not self.local_prices:
+            return None
+
+        best_ratio = 666.0
+        best_item = None
+        best_ratio_craft = 666.0
+        best_item_craft = None
+        for item in items:
+            if item["usable"]:
+                if len(item["possibleEffects"]) == 1:
+                    effect = item["possibleEffects"][0]
+                    if effect["effectId"] == 110:
+                        if not str(item["id"]) in self.local_prices:
+                            continue
+                        item_price = self.local_prices[str(item["id"])]
+                        craft_price = self.get_craft_price(item["id"])
+                        mean_regen = (
+                            float(effect["diceNum"]) + float(effect["diceSide"]) / 2
+                        )
+                        if mean_regen < 50:
+                            continue
+                        ratio = float(item_price) / mean_regen
+                        if ratio < best_ratio:
+                            best_ratio = ratio
+                            best_item = item
+                        if craft_price:
+                            ratio_craft = float(craft_price) / mean_regen
+                            if ratio_craft < best_ratio_craft:
+                                best_ratio_craft = ratio_craft
+                                best_item_craft = item
+        if not best_item:
+            self.send_message(
+                f"{self.channels[channel]} Erreur, aucun item trouvé avec l'effet de régénération de vie"
+            )
+            return
+        item_name = id_to_name(best_item["nameId"])
+        msg = f"{self.channels[channel]} Meilleur ratio prix/vie : {item_name} ({best_ratio:.1f} K/vie)"
+        if best_item_craft and best_ratio_craft < best_ratio:
+            msg += f". Un craft de {item_name} est plus rentable, avec {best_ratio_craft:.1f} K/vie"
+        self.send_message(msg)
+
 
 class Biscuit(DofusModule):
     # Quality of Life assistant
@@ -190,10 +235,7 @@ class Biscuit(DofusModule):
 
             command_key = message.split(" ")[0][1:]
             if command_key in self.commander.commands:
-                try:
-                    self.commander.commands[command_key](packet, packet["channel"])
-                except Exception as e:
-                    print(f"Error while executing command {command_key}: {e}")
+                self.commander.commands[command_key](packet, packet["channel"])
 
     def handle_ChatServerWithObjectMessage(self, packet):
         """Triggered when a message with objects is received in the chat (including the player's)"""
