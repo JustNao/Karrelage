@@ -27,6 +27,7 @@ class Commander:
             "ecaflipus": lambda _, channel: self.portals("ecaflipus", channel),
             "price": lambda packet, channel: self.price(packet, channel),
             "regen": lambda _, channel: self.regen(channel),
+            "almanax": lambda _, channel: self.almanax(channel),
         }
         self.channels = {
             2: "/g",
@@ -154,6 +155,26 @@ class Commander:
         if best_item_craft and best_ratio_craft < best_ratio:
             msg += f". Un craft de {item_name} est plus rentable, avec {best_ratio_craft:.1f} K/vie"
         self.send_message(msg)
+
+    def almanax(self, channel):
+        data = {
+            "action": "wpda_datatables",
+            "wpnonce": "ddf53adf5f",
+            "pubid": 8,
+        }
+        response = rq.post(
+            "https://www.gamosaurus.com/wp-admin/admin-ajax.php", data=data
+        )
+        if response.status_code != 200:
+            self.send_message(
+                f"{self.channels[channel]} Erreur, impossible de récupérer les données de l'almanax"
+            )
+            return
+        formatted_response = response.json()
+        offrande, reward, bonus = formatted_response["data"][0]
+        self.send_message(
+            f"{self.channels[channel]} Offrande du jour : {offrande}. Récompense : {reward}K. Bonus : {bonus}"
+        )
 
 
 class Biscuit(DofusModule):
