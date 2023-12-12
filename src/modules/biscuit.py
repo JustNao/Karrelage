@@ -123,7 +123,7 @@ class Commander:
         best_ratio_craft = 666.0
         best_item_craft = None
         for item in items:
-            if item["usable"]:
+            if item["usable"] and item["craftFeasible"] != "null":
                 if len(item["possibleEffects"]) == 1:
                     effect = item["possibleEffects"][0]
                     if effect["effectId"] == 110:
