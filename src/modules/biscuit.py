@@ -158,7 +158,7 @@ class Commander:
 
     def almanax(self, channel):
         current_date = datetime.now()
-        formatted_date = current_date.strftime('%Y-%m-%d')
+        formatted_date = current_date.strftime("%Y-%m-%d")
         url = f"https://alm.dofusdu.de/dofus/v1/fr/{formatted_date}"
         response = rq.get(url)
         if response.status_code != 200:
@@ -167,20 +167,16 @@ class Commander:
             )
             return
         response = response.json()
-        if response['data'] == None:
+        if response["data"] == None:
             self.send_message(
                 f"{self.channels[channel]} Aucune offre d'Almanax aujourd'hui"
             )
             return
-        # Extract the required data from the response
-        item_name = response['data']['item_name']
-        item_quantity = response['data']['item_quantity']
-        bonus_description = response['data']['bonus']['description']
-        # Format the data into a message
-        message = f"/g Offrande: {item_name} // Quantité: {item_quantity} // Bonus: {bonus_description}"
-        # Send the message
+        item_name = response["data"]["item_name"]
+        item_quantity = response["data"]["item_quantity"]
+        bonus_description = response["data"]["bonus"]["description"]
+        message = f"{self.channels[channel]} Offrande: {item_name} // Quantité: {item_quantity} // Bonus: {bonus_description}"
         self.send_message(message)
-        
 
 
 class Biscuit(DofusModule):
