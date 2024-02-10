@@ -157,24 +157,30 @@ class Commander:
         self.send_message(msg)
 
     def almanax(self, channel):
-        data = {
-            "action": "wpda_datatables",
-            "wpnonce": "ddf53adf5f",
-            "pubid": 8,
-        }
-        response = rq.post(
-            "https://www.gamosaurus.com/wp-admin/admin-ajax.php", data=data
-        )
+        current_date = datetime.now()
+        formatted_date = current_date.strftime('%Y-%m-%d')
+        url = f"https://alm.dofusdu.de/dofus/v1/fr/{formatted_date}"
+        response = rq.get(url)
         if response.status_code != 200:
             self.send_message(
                 f"{self.channels[channel]} Erreur, impossible de récupérer les données de l'almanax"
             )
             return
-        formatted_response = response.json()
-        offrande, reward, bonus = formatted_response["data"][0]
-        self.send_message(
-            f"{self.channels[channel]} Offrande du jour : {offrande}. Récompense : {reward}K. Bonus : {bonus}"
-        )
+        response = response.json()
+        if response['data'] == None:
+            self.send_message(
+                f"{self.channels[channel]} Aucune offre d'Almanax aujourd'hui"
+            )
+            return
+        # Extract the required data from the response
+        item_name = response['data']['item_name']
+        item_quantity = response['data']['item_quantity']
+        bonus_description = response['data']['bonus']['description']
+        # Format the data into a message
+        message = f"/g Offrande: {item_name} // Quantité: {item_quantity} // Bonus: {bonus_description}"
+        # Send the message
+        self.send_message(message)
+        
 
 
 class Biscuit(DofusModule):
