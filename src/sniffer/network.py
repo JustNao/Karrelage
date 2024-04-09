@@ -18,10 +18,11 @@ import threading
 from select import select
 import errno
 
-from scapy.all import plist, conf
-from scapy.all import Raw, IP, PcapReader
+from scapy import plist
+from scapy.all import Raw, PcapReader, conf
 from scapy.data import ETH_P_ALL, MTU
 from scapy.consts import WINDOWS
+from scapy.layers.inet import IP
 import logging
 
 
@@ -72,9 +73,6 @@ refresh : float
 
     # on Windows, it is not possible to select a L2socket
     if WINDOWS:
-        from scapy.arch.pcapdnet import PcapTimeoutElapsed
-
-        read_allowed_exceptions = (PcapTimeoutElapsed,)
 
         def _select(sockets):
             return sockets

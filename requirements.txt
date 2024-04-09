@@ -7,7 +7,7 @@ mouse
 numpy
 psutil
 PyAutoGUI
-scapy==2.4.2
+scapy==2.5.0
 waitress
 pywin32
 tqdm
@@ -16,5 +16,5 @@ python-dotenv
 pyperclip
 python-dateutil
 playsound==1.2.2
-undetected_chromedriver
+undetected_chromedriverppp
 git+https://github.com/JustNao/Py3AMF.git@master
