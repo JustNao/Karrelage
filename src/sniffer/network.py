@@ -98,18 +98,21 @@ def launch_in_thread(action, capture_file=None):
     global stop
     logger.debug("Launching sniffer in thread...")
 
-    def _sniff(_):
+    def _sniff(stop_event):
+        stop_filter = lambda _: stop_event.is_set()
         if capture_file:
             sniff(
                 filter="tcp port 5555",
                 lfilter=lambda p: p.haslayer(Raw),
                 prn=lambda p: on_receive(p, action),
+                stop_filter=stop_filter,
                 offline=capture_file,
             )
         else:
             sniff(
                 filter="tcp port 5555",
                 lfilter=lambda p: p.haslayer(Raw),
+                stop_filter=stop_filter,
                 prn=lambda p: on_receive(p, action),
             )
         logger.info("sniffing stopped")
@@ -119,7 +122,10 @@ def launch_in_thread(action, capture_file=None):
     t.start()
 
     def stop():
+        buf1.end()
+        buf2.end()
         e.set()
+        print("Sniffer stopped")
 
     logger.debug("Started sniffer in new thread")
 
