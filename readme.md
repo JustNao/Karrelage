@@ -70,7 +70,7 @@ Karrelage est un MITM pour Dofus 2.XX en Python 3. C'est la suite de [DofusHelpe
 1. Installer [Python 3](https://www.python.org/downloads/)
 2. Ajouter PIP (installé avec les dernières versions de Python) [à votre Path](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/). Si vous n'avez rien touché à l'installation de python, le dossier à ajouter devrait être
    'C:\Program Files\Python3XX\Scripts'.
-3. Installer Npcap <= [1.60](https://npcap.com/dist/npcap-1.60.exe)
+3. Installer Npcap (https://npcap.com/dist)
 4. Installer [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 5. Exporter le git (bash, zip, ...)
 6. Installer les packages python

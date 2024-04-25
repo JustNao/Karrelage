@@ -19,7 +19,7 @@ from select import select
 import errno
 
 from scapy import plist
-from scapy.all import Raw, PcapReader, conf
+from scapy.all import Raw, PcapReader, conf, sniff
 from scapy.data import ETH_P_ALL, MTU
 from scapy.consts import WINDOWS
 from scapy.layers.inet import IP
@@ -29,99 +29,7 @@ import logging
 from ..data import Buffer, Msg
 
 logger = logging.getLogger("labot")
-
-
-def sniff(
-    store=False,
-    prn=None,
-    lfilter=None,
-    stop_event=None,
-    refresh=0.1,
-    offline=None,
-    *args,
-    **kwargs
-):
-    """Sniff packets
-sniff([count=0,] [prn=None,] [store=1,] [offline=None,] [lfilter=None,] + L2ListenSocket args)
-Modified version of scapy.all.sniff
-
-store : bool
-    wether to store sniffed packets or discard them
-
-prn : None or callable
-    function to apply to each packet. If something is returned,
-    it is displayed.
-    ex: prn = lambda x: x.summary()
-
-lfilter : None or callable
-    function applied to each packet to determine
-    if further action may be done
-    ex: lfilter = lambda x: x.haslayer(Padding)
-
-stop_event : None or Event
-    Event that stops the function when set
-
-refresh : float
-    check stop_event.set() every `refresh` seconds
-    """
-    logger.debug("Setting up sniffer...")
-    if offline is None:
-        L2socket = conf.L2listen
-        s = L2socket(type=ETH_P_ALL, *args, **kwargs)
-    else:
-        s = PcapReader(offline)
-
-    # on Windows, it is not possible to select a L2socket
-    if WINDOWS:
-
-        def _select(sockets):
-            return sockets
-
-    else:
-        read_allowed_exceptions = ()
-
-        def _select(sockets):
-            try:
-                return select(sockets, [], [], refresh)[0]
-            except OSError as exc:
-                # Catch 'Interrupted system call' errors
-                if exc.errno == errno.EINTR:
-                    return []
-                raise
-
-    lst = []
-    try:
-        logger.debug("Started Sniffing")
-        while True:
-            if stop_event and stop_event.is_set():
-                break
-            sel = _select([s])
-            if s in sel:
-                try:
-                    p = s.recv(MTU)
-                except read_allowed_exceptions:
-                    # could add a sleep(refresh) if the CPU usage
-                    # is too much on windows
-                    continue
-                if p is None:
-                    break
-                if lfilter and not lfilter(p):
-                    continue
-                if store:
-                    lst.append(p)
-                if prn:
-                    r = prn(p)
-                    if r is not None:
-                        print(r)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        logger.debug("Stopped sniffing.")
-        s.close()
-
-    return plist.PacketList(lst, "Sniffed")
-
-
+    
 def raw(pa):
     """Raw data from a packet
     """
@@ -190,12 +98,11 @@ def launch_in_thread(action, capture_file=None):
     global stop
     logger.debug("Launching sniffer in thread...")
 
-    def _sniff(stop_event):
+    def _sniff(_):
         if capture_file:
             sniff(
                 filter="tcp port 5555",
                 lfilter=lambda p: p.haslayer(Raw),
-                stop_event=stop_event,
                 prn=lambda p: on_receive(p, action),
                 offline=capture_file,
             )
@@ -203,7 +110,6 @@ def launch_in_thread(action, capture_file=None):
             sniff(
                 filter="tcp port 5555",
                 lfilter=lambda p: p.haslayer(Raw),
-                stop_event=stop_event,
                 prn=lambda p: on_receive(p, action),
             )
         logger.info("sniffing stopped")
