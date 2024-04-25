@@ -28,12 +28,14 @@ class Commander:
             "price": lambda packet, channel: self.price(packet, channel),
             "regen": lambda _, channel: self.regen(channel),
             "almanax": lambda _, channel: self.almanax(channel),
+            "familier": lambda _, channel: self.xp_familier(channel),
         }
         self.channels = {
             2: "/g",
             4: "/p",
         }
         local_prices = load_dat("itemAveragePrices")
+        self.xp_familier_list = load("xp_familier")
         if not "Draconiros" in local_prices:
             print("Local prices for Draconiros not found, $price command will not work")
             self.local_prices = None
@@ -85,13 +87,16 @@ class Commander:
                 f"{self.channels[channel]} Portail {zone} dernièrement vu en [{pos_x},{pos_y}] il y'a {time}"
             )
 
-    def get_craft_price(self, item_id: int):
+    def get_craft_price(self, item_id: int) -> None | int:
         if not self.local_prices:
             return None
 
         recipe = get_recipe(item_id)
         if not recipe:
-            return self.local_prices[str(item_id)]
+            try:
+                return self.local_prices[str(item_id)]
+            except KeyError:
+                return None
 
         total_price = 0
         for ingredient_id, quantity in zip(
@@ -176,6 +181,27 @@ class Commander:
         item_quantity = response["data"]["item_quantity"]
         bonus_description = response["data"]["bonus"]["description"]
         message = f"{self.channels[channel]} Offrande: {item_name} // Quantité: {item_quantity} // Bonus: {bonus_description}"
+        self.send_message(message)
+        
+    def xp_familier(self, channel):
+        best_item = None
+        best_ratio = 1e9
+        for id, item in self.xp_familier_list.items():
+            xp_per_item = item["experience"] / item["quantity"]
+            item_price = self.get_craft_price(id)
+            if item_price is None or xp_per_item == 0:
+                continue
+            if item_price < 10:
+                # Filter for weird prices
+                continue
+            ratio = item_price / xp_per_item
+            if ratio < best_ratio:
+                best_ratio = ratio
+                best_item = item
+        if best_item is None:
+            message = f"{self.channels[channel]} Pas d'item le plus rentable trouvé"
+        else:
+            message = f"{self.channels[channel]} L'item le plus rentable pour monter un familier est [{best_item["name"]}], avec un ratio de {ratio} kamas/XP"
         self.send_message(message)
 
 

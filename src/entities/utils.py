@@ -9,7 +9,7 @@ def load(file):
         return json.load(f)
 
 
-def save(data, file):
+def save(data: dict, file: str):
     with gzip.open(
         f"src/entities/gameRessources/{file}.gz", "wt", encoding="utf-8"
     ) as f:
