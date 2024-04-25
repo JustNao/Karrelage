@@ -133,7 +133,7 @@ Forgemager est un module de calcul automatique du reliquat. Il suit les runes ut
 
 Biscuit est un module "Quality of Life". Il est destiné à être laissé en arrière plan, si un autre module n'est pas déjà en cours d'execution. C'est ici que je mets toutes les idées de petites fonctionnalités utiles qui n'ont pas de raison d'avoir un module à part. Pour l'instant, il y'a :
 
-- Un système de commandes, utilisables en jeu. Il suffit d'utiliser le canal de guilde `/g` our groupe `/p`, et de lancer les commander avec `$command`. Par exemple, `$price` suivi d'un link (Ctrl+shift) d'un item va calculer le prix de craft estimé à partir de la recette, et du prix moyen des ressources associées. `$srambad` et les autres variantes de dimension va afficher la position des portails de la dimension en question. Les réponses sont envoyées dans le chat actuel.
+- Un système de commandes, utilisables en jeu. Il suffit d'utiliser le canal de guilde `/g` ou groupe `/p`, et de lancer les commander avec `$command`. Par exemple, `$price` suivi d'un link (Ctrl+shift) d'un item va calculer le prix de craft estimé à partir de la recette, et du prix moyen des ressources associées. `$srambad` et les autres variantes de dimension va afficher la position des portails de la dimension en question. Les réponses sont envoyées dans le chat actuel.
 - Une détection d'archimonstre & d'avis de recherche (un son est joué en entrant sur la map), et une détection de maisons abandonnées seules (qui seront donc mises en vente au mois prochain).
   L'interface permet de choisir quels outils utiliser.
 
@@ -183,6 +183,16 @@ Commande pour lancer l'auto-compilation du CSS par TailwindCSS (nécessite `Node
 
 ```sh
 npx tailwindcss -i ./static/src/input.css -o ./static/dist/css/output.css --watch
+```
+
+Manuellement mettre à jour les packets (nécessite FFDec, testé avec la [version 20.1.0](https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/version20.1.0)) :
+```sh
+python scripts/update_packets.py
+```
+
+Manuellement mettre à jour les ressources du jeu (noms d'item, noms de monstres, etc...):
+```sh
+python -m scripts.update_game_ressources
 ```
 
 ## Copyright
