@@ -54,33 +54,16 @@ class Msg:
                 count = None
             lenData = int.from_bytes(buf.read(header & 3), "big")
             id = header >> 2
-            try:
-                if id != 2:
-                    protocol.msg_from_id[id]
-            except KeyError:
-                # print(Fore.RED + "Flushing buffer" + Fore.RESET)
-                buf.pos = len(buf)
-                buf.end()
-                return None
             data = Data(buf.read(lenData))
         except IndexError as e:
-            if e.args[1] == 0 or e.args[1] > 20000:
-                buf.pos = len(buf)
-            else:
-                buf.pos = 0
+            buf.pos = 0
             logger.debug("Multi packet message with id", id)
             return None
         else:
             if id == 2:
                 logger.debug("Message is NetworkDataContainerMessage! Uncompressing...")
-                try:
-                    newbuffer = Buffer(data.readByteArray())
-                except IndexError:
-                    return None
-                try:
-                    newbuffer.uncompress()
-                except zlib.error:
-                    return None
+                newbuffer = Buffer(data.readByteArray())
+                newbuffer.uncompress()
                 msg = Msg.fromRaw(newbuffer, from_client)
                 assert msg is not None and not newbuffer.remaining()
                 return msg
