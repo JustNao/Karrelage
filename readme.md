@@ -195,6 +195,12 @@ Manuellement mettre à jour les ressources du jeu (noms d'item, noms de monstres
 python -m scripts.update_game_ressources
 ```
 
+## Troubleshoot
+
+Si rien ne se passe quand vous lancez Karrelage, et le module debug n'affiche aucun paquet reçu :
+1. Vérifiez que votre protocol.pk est à jour (la version du jeu est dans le ficheir `DOFUS_VERSION`)
+2. Spécifiez l'interface que vous utilisez dans `src/sniffer/network.py:118`. Par défaut Scapy sniff les paquets sur conf.iface, qui peut ne pas correspondre à l'interface utilisée pour Dofus.
+
 ## Copyright
 
 <a name="copyright"></a>

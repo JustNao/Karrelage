@@ -106,6 +106,7 @@ def launch_in_thread(action, capture_file=None):
                 lfilter=lambda p: p.haslayer(Raw),
                 prn=lambda p: on_receive(p, action),
                 stop_filter=stop_filter,
+                # iface="Ethernet", # Ethernet, Ethernet 2, Wi-Fi, Wi-Fi 2, etc ...
                 offline=capture_file,
             )
         else:
@@ -114,6 +115,7 @@ def launch_in_thread(action, capture_file=None):
                 lfilter=lambda p: p.haslayer(Raw),
                 stop_filter=stop_filter,
                 prn=lambda p: on_receive(p, action),
+                # iface="Ethernet", # Ethernet, Ethernet 2, Wi-Fi, Wi-Fi 2, etc ...
             )
         logger.info("sniffing stopped")
 
