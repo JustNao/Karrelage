@@ -1,3 +1,4 @@
+import re
 import pyperclip
 import json
 import os
@@ -107,16 +108,25 @@ class Commander:
         return total_price
 
     def price(self, packet, channel: int):
-        gid = packet["objects"][0]["objectGID"]
-        price = self.get_craft_price(gid)
-        if not price:
-            self.send_message(
-                f"{self.channels[channel]} Prix de craft : inconnu. Un des items n'est pas dans la base de données"
-            )
+        pattern = r"{recipe,(\d+)}"
+        # Find all matches
+        matches = re.findall(pattern, packet["content"])
+
+        if not matches:
+            print("No matches found")
             return
-        self.send_message(
-            f"{self.channels[channel]} Prix de craft estimé : {kamasToString(price)} K"
-        )
+    
+        for recipe_id in matches:
+            print(f"Extracted recipe ID: {recipe_id}")
+            price = self.get_craft_price(recipe_id)
+            if not price:
+                self.send_message(
+                    f"{self.channels[channel]} Prix de craft : inconnu. Un des items n'est pas dans la base de données"
+                )
+                return
+            self.send_message(
+                f"{self.channels[channel]} Prix de craft estimé : {kamasToString(price)} K"
+            )
 
     def regen(self, channel):
         items = load("Items")
