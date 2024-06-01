@@ -108,17 +108,9 @@ class Commander:
         return total_price
 
     def price(self, packet, channel: int):
-        pattern = r"{recipe,(\d+)}"
-        # Find all matches
-        matches = re.findall(pattern, packet["content"])
-
-        if not matches:
-            print("No matches found")
-            return
-    
-        for recipe_id in matches:
-            print(f"Extracted recipe ID: {recipe_id}")
-            price = self.get_craft_price(recipe_id)
+        def handle_price_gid(gid):
+            print(f"Extracted GID: {gid}")
+            price = self.get_craft_price(gid)
             if not price:
                 self.send_message(
                     f"{self.channels[channel]} Prix de craft : inconnu. Un des items n'est pas dans la base de données"
@@ -127,6 +119,21 @@ class Commander:
             self.send_message(
                 f"{self.channels[channel]} Prix de craft estimé : {kamasToString(price)} K"
             )
+        if "objects" in packet and len(packet["objects"]) > 0 and "objectGID" in packet["objects"][0]:
+            gid = packet["objects"][0]["objectGID"]
+            handle_price_gid(gid)
+        else:
+            # Fall back in case we don't have a match on the primary packet lets try finding the recipe bind.
+            pattern = r"{recipe,(\d+)}"
+            # Find all matches
+            matches = re.findall(pattern, packet["content"])
+
+            if not matches:
+                print("No matches found")
+                return
+    
+            for gid in matches:
+                handle_price_gid(gid)
 
     def regen(self, channel):
         items = load("Items")
