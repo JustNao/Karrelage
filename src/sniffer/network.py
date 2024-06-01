@@ -124,8 +124,7 @@ def launch_in_thread(action, capture_file=None):
     t.start()
 
     def stop():
-        buf1.end()
-        buf2.end()
+        flush_buffers()
         e.set()
         print("Sniffer stopped")
 
@@ -143,11 +142,9 @@ def on_msg(msg):
     print(msg.data)
     print(Msg.from_json(msg.json()).data)
 
-def flushBuffers():
-    global buf1, buf2
-    print("Flushing buffers")
-    buf1 = Buffer()
-    buf2 = Buffer()
+def flush_buffers():
+    buf1.end()
+    buf2.end()
 
 if __name__ == "__main__":
     stop = launch_in_thread(on_msg)

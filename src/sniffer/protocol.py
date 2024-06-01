@@ -1,7 +1,6 @@
 from functools import reduce
 import logging
 import random
-from zlib import decompress
 
 from .protocol_load import types, msg_from_id, types_from_id, primitives
 from ..data import Data, Buffer
@@ -139,4 +138,7 @@ def readMsg(msg):
         return read(msg_from_id[msg.id]["name"], msg.data)
     except AssertionError:
         logger.error("Assertion error while reading packet %s", msg.id)
+        return None
+    except (IndexError, KeyError):
+        logger.error("Unknown packet ID")
         return None
