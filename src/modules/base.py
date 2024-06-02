@@ -10,7 +10,7 @@ class DofusModule:
             print("Broken buffers, flushing")
             network.flush_buffers()
             return
-        handle = f"handle_{packet["__type__"]}"
+        handle = f"handle_{packet['__type__']}"
         if hasattr(self, handle) and callable(handler := getattr(self, handle)):
             if packet is None:
                 packet = protocol.readMsg(msg)
