@@ -14,7 +14,7 @@ def get_monster_name(id: int):
         nameId = [obj for obj in monsterJs if obj["id"] == id][0]["nameId"]
         name = i18n["texts"][str(nameId)]
         return name
-    except KeyError:
+    except (IndexError, KeyError) as e:
         print("Couldn't identify", id)
         return ""
 
